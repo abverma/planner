@@ -5,48 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planner</title>
-    <style>
-        body {
-            padding: 10px;
-            margin: 0px;
-        }
-        .main {
-            display: flex;
-            flex-direction: row;
-        }
-
-        .form, .stats {
-            flex: 1;
-        }
-
-        .form *, .stats * {
-            margin: 2px;
-        }
-
-        .subHeading {
-            padding-right: 18px;
-        }
-
-        .stats {
-            text-align: right;
-        }
-
-        .error {
-            color: red;
-        }
-
-        ul {
-            padding: 10px 10px 10px 10px;
-            list-style: none;
-        }
-
-        .total {
-            padding-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body>
-    <h1>Planner</h1>
+    <header>
+        <h1>Planner</h1>
+    </header>
     <div class="main">
         <div class="form">
             <input id="selectedDate" type="date"></input><br>
@@ -164,6 +128,7 @@
         }
 
         const populateList = (tasks) => {
+            getLastTask()
             taskList.innerHTML = ''
             totalDailyScore = 0
             checkedCount = 0
@@ -276,7 +241,7 @@
                     return resp.json();
                 })
                 .then((task) => {
-                    lastTask.innerHTML += task.date ? formatDate(task.date) : ''
+                    lastTask.innerHTML = task.date ? formatDate(task.date) : ''
                 })
                 .catch((e) => {
                     console.log(e)
@@ -293,7 +258,6 @@
             })
             if (resp.ok) {
                 console.log('Task deleted')
-                lastTask
             } else {
                 console.log(resp.body)
                 const result = await resp.json()
@@ -310,9 +274,7 @@
         }
 
         getTasksForSelectedDate()
-        getFrequentTasks()
-        getLastTask()
-        
+        getFrequentTasks()        
     </script>
 </body>
 </html>

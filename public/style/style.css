@@ -1,0 +1,57 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    padding: 10px;
+    margin: 0px;
+}
+
+header {
+    padding: 15px;
+}
+
+.main {
+    display: flex;
+    flex-direction: row;
+}
+
+.form, .stats {
+    flex: 1;
+}
+
+.form *, .stats * {
+    margin: 2px;
+}
+
+.subHeading {
+    padding-right: 18px;
+}
+
+.stats {
+    text-align: right;
+}
+
+.error {
+    color: red;
+}
+
+ul {
+    padding: 10px 10px 10px 10px;
+    list-style: none;
+}
+
+.total {
+    padding-top: 20px;
+}
+
+@media only screen and (max-width: 768px) {
+    .main {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stats {
+        text-align: left;
+    }
+}

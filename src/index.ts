@@ -1,6 +1,7 @@
 import express from 'express'
 import { json, urlencoded } from 'body-parser'
 import mongoose from 'mongoose'
+import moment from 'moment'
 import path from 'path'
 import { TaskRouter } from './routes'
 import BaseModel from './baseModel'
@@ -18,6 +19,7 @@ app.use((req, res, next) => {
     console.log(req.method, req.path)
     next()
 })
+app.use(express.static(path.join(__dirname, '../public/style/')))
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'))
 })
@@ -25,13 +27,10 @@ app.get('/tasks', async (req, res) => {
     const filter: any = req.query
     if (filter['date']) {
         const selectedDate = new Date(filter['date'])
-        const nextDate = new Date(selectedDate)
-        nextDate.setDate(nextDate.getDate() + 1)
-        nextDate.setHours(0, 0, 0)
 
         filter['date'] = {
-            $gte: selectedDate,
-            $lt: nextDate
+            $gte: moment(selectedDate).startOf('day').format(),
+            $lt: moment(selectedDate).endOf('day').format()
         }
     }
     try {
@@ -62,8 +61,8 @@ app.get('/frequestTasks', async (req, res) => {
     const limit = 10
 
     filter['date'] = {
-        $gte: new Date(new Date().setDate(minDate)),
-        $lte: new Date(new Date().setDate(maxDate + 1))
+        $gte:moment().subtract(7, 'days').format(),
+        $lte:  moment().format()
     }
 
     try {

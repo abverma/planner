@@ -3,7 +3,7 @@ import TaskModel from './taskModel'
 
 const lexicon: { [name: string]: string[]} = {
     'resistance-training': ['workout', 'ub workout', 'lb workout', 'fb workout', 'upper body workout', 'lower body workout', 'full body workout', 'lbw', 'fbw', 'ubw', 'ubrw', 'ubmew', 'ub max effort workout', 'upper body max effort workout', 'upper body repetition'],
-    'cleaning': ['dishes', 'wash dishes', 'jhadu', 'pocha', 'poccha', 'vacuum', 'mini vacuum', 'clean kitchen', 'toilet', 'toilet seat', 'granite', 'litterbox', 'bin', 'take out bin', 'take out bins', 'bins', 'clean balcony', 'dusting', 'clean table', 'cleaned table', 'tidy', 'tidy up'],
+    'cleaning': ['dishes', 'wash dishes', 'jhadu', 'pocha', 'poccha', 'vacuum', 'mini vacuum', 'clean kitchen', 'toilet', 'toilet seat', 'granite', 'litterbox', 'bin', 'take out bin', 'take out bins', 'bins', 'clean balcony', 'dusting', 'clean table', 'cleaned table', 'tidy', 'tidy up', 'washed groceries'],
     'chore': ['laundry', 'dry laundry', 'breakfast', 'lunch', 'dinner', 'cook', 'water plants', 'plants', 'grocery', 'groceries', 'watered plants'],
     'cardio': ['swimming', 'running', 'walking'],
     'productivity': ['meditation', 'study', 'coding', 'personal project', 'wordle', 'read', 'reading', 'german'],

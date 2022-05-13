@@ -41,14 +41,14 @@ input {
 
 .form {
     flex: .7;
-    border: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
     margin: 2px;
     padding: 10px;
 }
 
 .stats {
     flex: .3;
-    border: 1px solid lightgray;
+    /* border-left: 1px solid lightgray; */
     margin: 2px;
     padding: 10px;
 }
@@ -80,9 +80,14 @@ ul {
     padding-top: 20px;
 }
 
-@media only screen and (min-width: 600px) {
+@media only screen and (min-width: 768px) {
     .main {
         flex-direction: row;
+    }
+
+    .form {
+        border-right: 1px solid lightgray;
+        border-bottom: none;
     }
 
     .stats {

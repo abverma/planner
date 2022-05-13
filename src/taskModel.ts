@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import BaseModel from './baseModel'
+import moment from 'moment'
 
 interface taskType {
     subject?: string,
@@ -29,6 +30,9 @@ export default class Task extends BaseModel{
     async delete(filter: any) {
         console.log(JSON.stringify(filter))
         return this.model.deleteMany(filter)
+    }
+    async aggregate(pipelines: any) {
+        return this.model.aggregate(pipelines)
     }
 }
 

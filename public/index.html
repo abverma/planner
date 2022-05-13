@@ -36,6 +36,8 @@
             </div>
             <ul>
                 <li><span>Last Entry:</span><span id="lastTask"></span></li>
+                <li><span>Weekly Avg Score:</span><span id="weeklyAvg"></span></li>
+                <li><span>Monthly Avg Score:</span><span id="monthlyAvg"></span></li>
             </ul>
         </div>
     </div>
@@ -52,6 +54,8 @@
         const totalSpan = document.getElementById("total")
         const frequentHeader = document.getElementById("frequentHeader")
         const lastTask = document.getElementById("lastTask")
+        const weeklyAvg = document.getElementById("weeklyAvg")
+        const monthlyAvg = document.getElementById("monthlyAvg")
         const currentTasks = []
         let totalDailyScore = 0
         let selectedDateValue = formatDate(new Date().toISOString())
@@ -86,6 +90,7 @@
             console.log(confirmDelete)
             if (confirmDelete) {
                 deleteTasks(idsToDelete)
+                getTasksForSelectedDate()
             }
         })
 
@@ -128,7 +133,7 @@
         }
 
         const populateList = (tasks) => {
-            getLastTask()
+            getStats()
             taskList.innerHTML = ''
             totalDailyScore = 0
             checkedCount = 0
@@ -235,13 +240,26 @@
                 })
         }
 
-        const getLastTask = () => {
-            fetch('/lastTask')
+        const getStats = () => {
+            fetch('/getStats')
                 .then((resp) => {
                     return resp.json();
                 })
-                .then((task) => {
-                    lastTask.innerHTML = task.date ? formatDate(task.date) : ''
+                .then((stat) => {
+                    const lastTaskStat = stat.lastTask
+                    lastTask.innerHTML = lastTaskStat.date ? formatDate(lastTaskStat.date) : ''
+
+                    const weeklyAggregate = stat.weeklyAggr
+                    if (weeklyAggregate && weeklyAggregate.length) {
+                        const avg = weeklyAggregate[0].averageScore ? parseFloat(weeklyAggregate[0].averageScore).toFixed(2) : ''
+                        weeklyAvg.innerHTML = avg
+                    }
+
+                    const monthlyAggregate = stat.monthlyAggr
+                    if (monthlyAggregate && monthlyAggregate.length) {
+                        const avg = monthlyAggregate[0].averageScore ? parseFloat(monthlyAggregate[0].averageScore).toFixed(2) : ''
+                        monthlyAvg.innerHTML = avg
+                    }
                 })
                 .catch((e) => {
                     console.log(e)

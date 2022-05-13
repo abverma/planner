@@ -8,10 +8,10 @@ import BaseModel from './baseModel'
 
 const app = express()
 const PORT = process.env.PORT || 3000
-const HOST = process.env.HOST || 'localhost:27017'
+const HOST = process.env.HOST || '192.168.1.28:27017'
 const DB = process.env.DB || 'planner'
 const DBLINK: string = `mongodb://${HOST}/${DB}`
-let tasks: TaskRouter = new TaskRouter(new BaseModel(mongoose));
+let tasks: TaskRouter = new TaskRouter(new BaseModel(mongoose))
 
 app.use(urlencoded({ extended: false }))
 app.use(json())
@@ -95,10 +95,52 @@ app.delete('/tasks', async (req, res) => {
         res.status(500).send({ error: e })
     }
 })
-app.get('/lastTask', async (req, res) => {
+app.get('/getStats', async (req, res) => {
     try {
+        const stat: any = {}
         const doc = await tasks.getTasks({}, 1)
-        res.send(doc.length ? doc[0] : {})
+        stat.lastTask = doc.length ? doc[0] : {}
+
+        let startDate = moment().startOf('week').format().split('T')[0]
+        const pipelines = [
+            {
+                $match: {
+                    date: {
+                        $gte: new Date(startDate),
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+                    score: {
+                        $sum: '$score',
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    averageScore: {
+                        $avg: '$score',
+                    },
+                },
+            },
+        ]
+        const weeklyAggr = await tasks.aggregate(pipelines)
+        stat.weeklyAggr = weeklyAggr
+
+        startDate = moment().startOf('month').format().split('T')[0]
+        pipelines[0] = {
+            '$match': {
+                date: {
+                    $gte: new Date(startDate),
+                }
+            }
+        }
+        const monthlyAggr = await tasks.aggregate(pipelines)
+        stat.monthlyAggr = monthlyAggr
+        res.send(stat)
     }
     catch (e) {
         console.log(e)

@@ -63,4 +63,8 @@ export class TaskRouter {
     async delete(query: object) {
         return this.model.delete(query)
     }
+
+    async aggregate(pipelines: object) {
+        return this.model.aggregate(pipelines)
+    }
 }

@@ -30,11 +30,12 @@ deleteBtn.addEventListener('click', (e) => {
 	if (taskList.hasChildNodes()) {
 		taskList.childNodes.forEach((li) => {
 			if (li.hasChildNodes()) {
-				const checkboxKey = Object.keys(li.childNodes).find((key) => {
-					const child = li.childNodes[key]
+                const div = li.childNodes[0]
+				const checkboxKey = Object.keys(div.childNodes).find((key) => {
+					const child = div.childNodes[key]
 					return child.tagName === 'INPUT' && child.type === 'checkbox'
 				})
-				if (li.childNodes[checkboxKey].checked) {
+				if (div.childNodes[checkboxKey].checked) {
 					idsToDelete.push(li.getAttribute('mongo_id'))
 				}
 			}
@@ -123,7 +124,7 @@ const populateList = (tasks) => {
 			subjectSpan.innerHTML = element.subject
 			div.appendChild(subjectSpan)
             lI.appendChild(div)
-            
+
             const badge = document.createElement('span')
             badge.innerHTML = element.score
             badge.setAttribute('class', 'badge bg-primary rounded-pill')

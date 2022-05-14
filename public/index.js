@@ -66,9 +66,12 @@ selectBtn.addEventListener('click', (e) => {
 })
 
 newTask.addEventListener('keyup', (e) => {
+    e.stopImmediatePropagation()
+    e.preventDefault()
 	if (newTask.value && e.code == 'Enter' && e.key == 'Enter') {
 		addNewTask(newTask.value)
 	}
+    return false
 })
 
 selectedDate.addEventListener('change', (e) => {
@@ -193,7 +196,6 @@ const createTask = async (task) => {
 		}
 	} catch (e) {
 		console.log(e)
-		throw e
 	}
 }
 

@@ -154,7 +154,9 @@ const populateFrequentTask = (tasks) => {
 		btn.value = task
 		btn.setAttribute('class', 'btn btn-sm btn-outline-dark form-control')
 		btn.addEventListener('click', (e) => {
+            e.preventDefault()
 			addNewTask(e.target.value)
+            return false
 		})
 		div.appendChild(btn)
 		frequentHeader.appendChild(div)

@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
 import BaseModel from './baseModel'
-import moment from 'moment'
 
 interface taskType {
     subject?: string,
@@ -10,7 +9,7 @@ interface taskType {
 }
 export default class Task extends BaseModel{
     model: any
-    taskSchema = new mongoose.Schema<taskType>({
+    schema = new mongoose.Schema<taskType>({
         subject: String,
         score: Number,
         date: Date,
@@ -18,7 +17,7 @@ export default class Task extends BaseModel{
     })
     constructor(db: BaseModel) {
         super(db.db)
-        this.model = this.db.model<taskType>('tasks', this.taskSchema);
+        this.model = this.db.model<taskType>('tasks', this.schema);
     }
     async create(task: {[key:string]: any}) {
         const newTask = new this.model(task);
@@ -35,8 +34,6 @@ export default class Task extends BaseModel{
         return this.model.aggregate(pipelines)
     }
 }
-
-
 
 async function main() {
     await mongoose.connect('mongodb://localhost:27017/planner')

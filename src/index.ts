@@ -3,15 +3,16 @@ import { json, urlencoded } from 'body-parser'
 import mongoose from 'mongoose'
 import moment from 'moment'
 import path from 'path'
-import { TaskRouter } from './routes'
-import BaseModel from './baseModel'
+import { TaskRouter } from './routes/taskroute'
+import BaseModel from './models/baseModel'
 
 const app = express()
 const PORT = process.env.PORT || 3000
 const HOST = process.env.HOST || '192.168.1.28:27017'
 const DB = process.env.DB || 'planner'
 const DBLINK: string = `mongodb://${HOST}/${DB}`
-let tasks: TaskRouter = new TaskRouter(new BaseModel(mongoose))
+const baseModel = new BaseModel(mongoose)
+const tasks: TaskRouter = new TaskRouter(baseModel)
 
 app.use(urlencoded({ extended: false }))
 app.use(json())

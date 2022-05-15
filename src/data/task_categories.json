@@ -1,0 +1,292 @@
+[{
+    "subject": "workout",
+    "category": "resistance-training"
+},
+{
+    "subject":"ub workout",
+    "category": "resistance-training"
+},
+{
+    "subject":"lb workout",
+    "category": "resistance-training"
+},
+{
+    "subject":"fb workout",
+    "category": "resistance-training"
+},
+{
+    "subject":"upper body workout",
+    "category": "resistance-training"
+},
+{
+    "subject":"lower body workout",
+    "category": "resistance-training"
+},
+{
+    "subject":"full body workout",
+    "category": "resistance-training"
+},
+{
+    "subject":"lbw",
+    "category": "resistance-training"
+},
+{
+    "subject":"fbw",
+    "category": "resistance-training"
+},
+{
+    "subject":"ubw",
+    "category": "resistance-training"
+},
+{
+    "subject":"ubrw",
+    "category": "resistance-training"
+},
+{
+    "subject":"ubmew",
+    "category": "resistance-training"
+},
+{
+    "subject":"ub max effort workout",
+    "category": "resistance-training"
+},
+{
+    "subject":"upper body max effort workout",
+    "category": "resistance-training"
+},
+{
+    "subject": "upper body repetition",
+    "category": "resistance-training"
+},
+{
+    "subject": "dishes",
+    "category": "cleaning"
+},
+{
+    "subject": "wash dishes",
+    "category": "cleaning"
+},
+{
+    "subject": "jhadu",
+    "category": "cleaning"
+},
+{
+    "subject": "pocha",
+    "category": "cleaning"
+},
+{
+    "subject": "poccha",
+    "category": "cleaning"
+},
+{
+    "subject": "vacuum",
+    "category": "cleaning"
+},
+{
+    "subject": "mini vacuum",
+    "category": "cleaning"
+},
+{
+    "subject": "clean kitchen",
+    "category": "cleaning"
+},
+{
+    "subject": "toilet",
+    "category": "cleaning"
+},
+{
+    "subject": "toilet seat",
+    "category": "cleaning"
+},
+{
+    "subject": "granite",
+    "category": "cleaning"
+},
+{
+    "subject": "litterbox",
+    "category": "cleaning"
+},
+{
+    "subject": "bin",
+    "category": "cleaning"
+},
+{
+    "subject": "take out bin",
+    "category": "cleaning"
+},
+{
+    "subject": "take out bins",
+    "category": "cleaning"
+},
+{
+    "subject": "bins",
+    "category": "cleaning"
+},
+{
+    "subject": "clean balcony",
+    "category": "cleaning"
+},
+{
+    "subject": "dusting",
+    "category": "cleaning"
+},
+{
+    "subject": "clean table",
+    "category": "cleaning"
+},
+{
+    "subject": "cleaned table",
+    "category": "cleaning"
+},
+{
+    "subject": "tidy",
+    "category": "cleaning"
+},
+{
+    "subject": "tidy up",
+    "category": "cleaning"
+},
+{
+    "subject": "washed groceries",
+    "category": "cleaning"
+},
+{
+    "subject": "laundry",
+    "category": "chores"
+},
+{
+    "subject": "dry laundry",
+    "category": "chores"
+},
+{
+    "subject": "breakfast",
+    "category": "chores"
+},
+{
+    "subject": "lunch",
+    "category": "chores"
+},
+{
+    "subject": "dinner",
+    "category": "chores"
+},
+{
+    "subject": "cook",
+    "category": "chores"
+},
+{
+    "subject": "water plants",
+    "category": "chores"
+},
+{
+    "subject": "plants",
+    "category": "chores"
+},
+{
+    "subject": "grocery",
+    "category": "chores"
+},
+{
+    "subject": "groceries",
+    "category": "chores"
+},
+{
+    "subject": "watered plants",
+    "category": "chores"
+},
+{
+    "subject": "swimming",
+    "category": "cardio"
+},
+{
+    "subject": "running",
+    "category": "cardio"
+},
+{
+    "subject": "walking",
+    "category": "cardio"
+},
+{
+    "subject": "meditation",
+    "category": "productivity"
+},
+{
+    "subject": "study",
+    "category": "productivity"
+},
+{
+    "subject": "coding",
+    "category": "productivity"
+},
+{
+    "subject": "personal project",
+    "category": "productivity"
+},
+{
+    "subject": "wordle",
+    "category": "productivity"
+},
+{
+    "subject": "read",
+    "category": "productivity"
+},
+{
+    "subject": "reading",
+    "category": "productivity"
+},
+{
+    "subject": "german",
+    "category": "productivity"
+},
+{
+    "subject": "fruit",
+    "category": "health"
+},
+{
+    "subject": "protein",
+    "category": "health"
+},
+{
+    "subject": "stretching",
+    "category": "health"
+},
+{
+    "subject": "foal roll",
+    "category": "health"
+},
+{
+    "subject": "massage",
+    "category": "health"
+},
+{
+    "subject": "gun massage",
+    "category": "health"
+},
+{
+    "subject": "yoga",
+    "category": "health"
+},
+{
+    "subject": "bathed",
+    "category": "health"
+},
+{
+    "subject": "bath",
+    "category": "health"
+},
+{
+    "subject": "brush",
+    "category": "health"
+},
+{
+    "subject": "brushed",
+    "category": "health"
+},
+{
+    "subject": "moisturised",
+    "category": "health"
+},
+{
+    "subject": "ate fruit",
+    "category": "health"
+}]

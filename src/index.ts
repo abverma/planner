@@ -149,6 +149,17 @@ app.get('/getStats', async (req, res) => {
         res.status(500).send({ error: e })
     }
 })
+app.get('/refactorData', (req, res) => {
+    try {
+        tasks.refactorData()
+        res.send({
+            status: 'in progress'
+        })
+    }
+    catch (e) {
+        console.log(e)
+    }
+})
 
 const prepareFrequentTaskMap = (result: any) => {
     const taskMap : { [name: string]: number} = {}

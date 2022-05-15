@@ -194,10 +194,13 @@ const createTask = async (task) => {
 		} else {
 			console.log(resp.body)
 			const result = await resp.json()
-			throw result.error
+            throw result.error
 		}
 	} catch (e) {
 		console.log(e)
+        if (e.validationError) {
+            throw e.error
+        }
 	}
 }
 

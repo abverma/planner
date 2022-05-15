@@ -20,4 +20,8 @@ export default class TaskCategories extends BaseModel{
         console.log(JSON.stringify(query))
         return this.model.findOne(query)
     }
+    async find(query: any, limit = 0, skip = 0) {
+        console.log(JSON.stringify(query))
+        return this.model.find(query).skip(skip).limit(limit)
+    }
 }

@@ -74,8 +74,8 @@ export class TaskRouter {
         }
     }
 
-    async getTasks(query: object, limit?: number) {
-        return this.model.find(query, limit)
+    async getTasks(query: object, limit?: number, skip?: number) {
+        return this.model.find(query, limit, skip)
     }
     
     async delete(query: object) {
@@ -84,5 +84,47 @@ export class TaskRouter {
 
     async aggregate(pipelines: object) {
         return this.model.aggregate(pipelines)
+    }
+
+    async refactorData() {
+        let skip = 0
+        const count = await this.model.count({})
+        const taskCategories = await this.taskCategoriesModel.find({})
+        let remaining = count
+        for (let i = 0; i < count && remaining > 0; i++, skip++) {
+            let task = await this.model.find({
+                'category': { 
+                    $exists: false 
+                }
+            }, 1, skip)
+            remaining = task.length
+            if (remaining) {
+                const x = task[0]
+                const sanitizedSubject = sanitizeSubject(x.subject).subject
+                console.log(x.subject)
+                // console.log(x.score)
+                const match = taskCategories.find((t: any) => {
+                    if (x.subject) {
+                        return t.subject.toLowerCase() == sanitizedSubject.toLowerCase()
+                    }
+                    return false
+                })
+                if (match) {
+                    x.category = match.category
+                    console.log('updating all ', x.subject, ' with category ', x.category)
+                    console.log(JSON.stringify(x))
+                    await this.model.update({
+                        subject: x.subject
+                    }, {
+                        $set: {
+                            category: x.category
+                        }
+                    })
+                } else {
+                    console.log('category not found')
+                }
+            }
+        }
+        
     }
 }

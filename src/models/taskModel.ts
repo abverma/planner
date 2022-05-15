@@ -5,7 +5,8 @@ interface taskType {
     subject?: string,
     score?: number,
     date?: Date,
-    creation_date?: string
+    creation_date?: string,
+    category?: string
 }
 export default class Task extends BaseModel{
     model: any
@@ -13,7 +14,8 @@ export default class Task extends BaseModel{
         subject: String,
         score: Number,
         date: Date,
-        creation_date: Date
+        creation_date: Date,
+        category: String
     })
     constructor(db: BaseModel) {
         super(db.db)
@@ -23,8 +25,8 @@ export default class Task extends BaseModel{
         const newTask = new this.model(task);
         return newTask.save()
     }
-    async find(filter: any, limit?: number) {
-        return limit ? this.model.find(filter).sort([['_id', -1]]).limit(limit) : this.model.find(filter).sort([['_id', -1]])
+    async find(filter: any, limit?: number, skip = 0) {
+        return limit ? this.model.find(filter).sort([['_id', -1]]).skip(skip).limit(limit) : this.model.find(filter).sort([['_id', -1]]).skip(skip)
     }
     async delete(filter: any) {
         console.log(JSON.stringify(filter))
@@ -32,6 +34,12 @@ export default class Task extends BaseModel{
     }
     async aggregate(pipelines: any) {
         return this.model.aggregate(pipelines)
+    }
+    async update(query: any, update: any) {
+        return this.model.updateMany(query, update)
+    }
+    async count(query: any) {
+        return this.model.count(query)
     }
 }
 

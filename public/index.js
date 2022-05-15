@@ -65,14 +65,14 @@ selectBtn.addEventListener('click', (e) => {
 	}
 })
 
-newTask.addEventListener('keyup', (e) => {
-    e.stopImmediatePropagation()
-    e.preventDefault()
-	if (newTask.value && e.code == 'Enter' && e.key == 'Enter') {
-		addNewTask(newTask.value)
-	}
-    return false
-})
+// newTask.addEventListener('keyup', (e) => {
+//     e.stopImmediatePropagation()
+//     e.preventDefault()
+// 	if (newTask.value && e.code == 'Enter' && e.key == 'Enter') {
+// 		addNewTask(newTask.value)
+// 	}
+//     return false
+// })
 
 selectedDate.addEventListener('change', (e) => {
 	selectedDateValue = e.target.value

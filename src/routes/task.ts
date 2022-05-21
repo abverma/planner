@@ -241,7 +241,7 @@ const addTask = async (task: any) => {
         })
         if (!categoryDoc) {
             categoryDoc = await taskCategoriesModel.findOne({
-                subject: new RegExp(subject).toLocaleString()
+                subject: new RegExp(subject.toLowerCase())
             })
         }
         if (categoryDoc) {

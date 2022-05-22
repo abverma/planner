@@ -3,9 +3,7 @@ import moment from 'moment'
 import mongoose from 'mongoose'
 import path from 'path'
 import passport from 'passport'
-import BaseModel from '../models/baseModel'
-import TaskCategoriesModel from '../models/taskCategoriesModel'
-import TaskModel from '../models/taskModel'
+import { TaskCategoriesModel, TaskModel, CategoryScoreModel} from '../models/models'
 
 let db: mongoose.Mongoose
 let Task: any
@@ -14,7 +12,6 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
     db = mongoose
     Task = TaskModel(db)
     const router = express.Router()
-    const baseModel = new BaseModel(mongoose)
 
     router.get('/tasks', async (req, res) => {
         const filter: any = req.query
@@ -170,15 +167,6 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
     return router
 }
 
-const scoreMap: { [name: string]: number} = {
-    'cardio': 10,
-    'resistance-training': 5, 
-    'cleaning': 3,
-    'chore': 2,
-    'productivity': 4,
-    'health': 3
-}
-
 const sanitizeSubject = (subject: string): any => {
     const r = /\d+/
     let multiplier = 1
@@ -236,6 +224,14 @@ const addTask = async (task: any) => {
         task.subject = task.subject.trim()
         const {subject, multiplier } = sanitizeSubject(task.subject)
         const taskCategoriesModel = TaskCategoriesModel(db)
+        const categoryScoreModel = CategoryScoreModel(db)
+        const scores = await categoryScoreModel.find({})
+        if (!scores.length) {
+            return Promise.reject({
+                validationError: true,
+                error: 'Scores not found'
+            })
+        }
         let categoryDoc = await taskCategoriesModel.findOne({
             subject: subject
         })
@@ -244,8 +240,11 @@ const addTask = async (task: any) => {
                 subject: new RegExp(subject.toLowerCase())
             })
         }
-        if (categoryDoc) {
-            score = scoreMap[categoryDoc.category]
+        if (scores.length && categoryDoc) {
+            const categoryScore = scores.find(x => categoryDoc && x.category.toLowerCase() == categoryDoc.get('category').toLowerCase())
+            if (categoryScore) {
+                score = categoryScore.score
+            }
         }
         if (!score) {
             return Promise.reject({

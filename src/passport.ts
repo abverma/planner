@@ -1,5 +1,5 @@
 import LocalStrategy from 'passport-local'
-import UserModel from './models/userModel'
+import { UserModel } from './models/models'
 import mongoose from 'mongoose'
 import passport from 'passport'
 

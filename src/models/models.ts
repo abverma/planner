@@ -23,6 +23,13 @@ interface categoryScoreType {
     score: number
 }
 
+interface noteType {
+    date: Date,
+    note: string
+    creation_date?: Date,
+}
+
+
 const taskSchema = new mongoose.Schema<taskType>({
     subject: String,
     score: Number,
@@ -46,6 +53,12 @@ const categoryScoreSchema = new mongoose.Schema<categoryScoreType>({
     score: Number
 })
 
+const noteSchema = new mongoose.Schema<noteType>({
+    date: Date,
+    note: String,
+    creation_date: Date
+})
+
 export function TaskCategoriesModel (mongooose: mongoose.Mongoose) {
     return mongoose.model<taskCategoryType>('task_categories', taskCategorySchema)
 }
@@ -60,4 +73,8 @@ export function TaskModel (mongoose: mongoose.Mongoose) {
 
 export function CategoryScoreModel (mongoose: mongoose.Mongoose) {
     return mongoose.model<categoryScoreType>('category_scores', categoryScoreSchema)
+}
+
+export function NoteModel (mongoose: mongoose.Mongoose) {
+    return mongoose.model<noteType>('notes', noteSchema)
 }

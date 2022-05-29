@@ -3,8 +3,10 @@ const selectBtn = document.getElementById('selectBtn')
 const deleteBtn = document.getElementById('deleteBtn')
 const taskList = document.getElementById('taskList')
 const newTask = document.getElementById('newTask')
+const dailyNote = document.getElementById('dailyNote')
 const selectedDate = document.getElementById('selectedDate')
 const errorSpan = document.getElementById('errorSpan')
+const errorSection = document.getElementById('errorSection')
 const totalSpan = document.getElementById('total')
 const frequentHeader = document.getElementById('frequentHeader')
 const lastTask = document.getElementById('lastTask')
@@ -65,25 +67,37 @@ selectBtn.addEventListener('click', (e) => {
 	}
 })
 
-// newTask.addEventListener('keyup', (e) => {
-//     e.stopImmediatePropagation()
-//     e.preventDefault()
-// 	if (newTask.value && e.code == 'Enter' && e.key == 'Enter') {
-// 		addNewTask(newTask.value)
-// 	}
-//     return false
-// })
+newTask.addEventListener('keydown', (e) => {
+	if (newTask.value && e.code == 'Enter' && e.key == 'Enter') {
+		e.preventDefault()
+		console.log(e.target.value)
+		addNewTask(e.target.value)
+		return false
+	}
+})
+
+dailyNote.addEventListener('keydown', (e) => {
+	if (dailyNote.value && e.code == 'Enter' && e.key == 'Enter') {
+		e.preventDefault()
+		console.log(e.target.value)
+		upsertNote(e.target.value)
+		return false
+	}
+})
 
 selectedDate.addEventListener('change', (e) => {
 	selectedDateValue = e.target.value
 	getTasksForSelectedDate()
+	getNoteForSelectedDate()
 })
 
 const addNewTask = async (task) => {
 	errorSpan.innerHTML = ''
+	errorSection.style.display = 'none'
 	try {
 		await createTask(task)
 	} catch (e) {
+		errorSection.style.display = 'block'
 		errorSpan.innerHTML = e
 	}
 	newTask.value = ''
@@ -153,6 +167,7 @@ const populateFrequentTask = (tasks) => {
 		btn.innerHTML = task
 		btn.value = task
 		btn.setAttribute('class', 'btn btn-sm btn-outline-dark form-control')
+		btn.setAttribute('type', 'button')
 		btn.addEventListener('click', (e) => {
             e.preventDefault()
 			addNewTask(e.target.value)
@@ -176,6 +191,20 @@ const getTasksForSelectedDate = () => {
 		})
 }
 
+const getNoteForSelectedDate = () => {
+	dailyNote.value = null
+	fetch('/note?date=' + selectedDateValue)
+		.then((resp) => {
+			return resp.json()
+		})
+		.then((note) => {
+			dailyNote.value = note.note 
+		})
+		.catch((e) => {
+			console.log(e)
+		})
+}
+
 const createTask = async (task) => {
 	try {
 		const resp = await fetch('/task', {
@@ -191,6 +220,33 @@ const createTask = async (task) => {
 		if (resp.ok) {
 			console.log('Task added')
 			getTasksForSelectedDate()
+		} else {
+			console.log(resp.body)
+			const result = await resp.json()
+            throw result.error
+		}
+	} catch (e) {
+		console.log(e)
+        if (e.validationError) {
+            throw e.error
+        }
+	}
+}
+
+const upsertNote = async (note) => {
+	try {
+		const resp = await fetch('/note', {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json;charset=utf-8',
+			},
+			body: JSON.stringify({
+				note,
+				date: selectedDateValue,
+			}),
+		})
+		if (resp.ok) {
+			console.log('Note updated')
 		} else {
 			console.log(resp.body)
 			const result = await resp.json()
@@ -269,4 +325,5 @@ function formatDate(date) {
 }
 
 getTasksForSelectedDate()
+getNoteForSelectedDate()
 getFrequentTasks()

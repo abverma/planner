@@ -3,7 +3,7 @@ import moment from 'moment'
 import mongoose from 'mongoose'
 import path from 'path'
 import passport from 'passport'
-import { TaskCategoriesModel, TaskModel, CategoryScoreModel} from '../models/models'
+import { TaskCategoriesModel, TaskModel, CategoryScoreModel, NoteModel} from '../models/models'
 
 let db: mongoose.Mongoose
 let Task: any
@@ -31,10 +31,41 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             console.log(e)
         }
     })
+    router.get('/note', async (req, res) => {
+        const filter: any = req.query
+        if (filter['date']) {
+            const selectedDate = new Date(filter['date'])
+    
+            filter['date'] = {
+                $gte: moment(selectedDate).startOf('day').format(),
+                $lt: moment(selectedDate).endOf('day').format()
+            }
+        }
+        try {
+            const result = await getNote(filter)
+            res.send(result)
+        }
+        catch (e) {
+            console.log(e)
+        }
+    })
     router.post('/task', async (req, res) => {
         const task = req.body
         try {
             const result = await addTask(task)
+            if (result) {
+                res.send(result)
+            }
+        } 
+        catch(e) {
+            console.log(e)
+            res.status(500).send({ error: e })
+        }
+    })
+    router.put('/note', async (req, res) => {
+        const note = req.body
+        try {
+            const result = await addNote(note)
             if (result) {
                 res.send(result)
             }
@@ -237,7 +268,7 @@ const addTask = async (task: any) => {
         })
         if (!categoryDoc) {
             categoryDoc = await taskCategoriesModel.findOne({
-                subject: new RegExp(subject.toLowerCase())
+                subject: subject.toLowerCase()
             })
         }
         if (scores.length && categoryDoc) {
@@ -255,7 +286,7 @@ const addTask = async (task: any) => {
         task.score = score * multiplier
         task.creation_date = new Date()
         const newTask = new Task(task)
-        return Promise.resolve(newTask.save())
+        return newTask.save()
     } 
     catch (e) {
         console.log(e)
@@ -267,6 +298,11 @@ const addTask = async (task: any) => {
 
 const getTasks = async (query: object, limit?: number, skip = 0) => {
     return limit ? Task.find(query).sort([['_id', -1]]).skip(skip).limit(limit) : Task.find(query).sort([['_id', -1]]).skip(skip)
+}
+
+const getNote = async (query: object, limit?: number, skip = 0) => {
+    const Note = NoteModel(db)
+    return Note.findOne(query)
 }
 
 const deleteMany = async (query: object) => {
@@ -317,5 +353,20 @@ const refactorData = async () => {
             }
         }
     }
-    
+}
+
+const addNote = async (note: any) => {
+    note.creation_date = new Date()
+    const Note = NoteModel(db)
+    return Note.updateOne({
+        date: new Date(note.date).toISOString().split('T')[0]
+    },{
+        $set: {
+            note: note.note,
+            date: new Date(note.date).toISOString().split('T')[0],
+            creation_date: new Date()
+        }
+    }, {
+        upsert: true
+    })
 }

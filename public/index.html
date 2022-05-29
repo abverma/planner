@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pro-Track</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <style>
+        #errorSection {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <header class="container-fluid text-center text-md-start border-bottom">
@@ -14,39 +19,46 @@
     <div class="container-fluid mb-md-3">
         <div class="row">
             <form class="col-md-8">
-                <div class="row align-items-center justify-content-md-start justify-content-between bg-light pt-2">
+                <div class="row align-items-center justify-content-md-start justify-content-between bg-light pt-2 mb-2">
                     <h4 class="col-2 col-md-2">Tasks</h4>
                     <h4 class="col-4" id="total"></h4>
                 </div>
                 <div class="row mb-4">
-                    <label for="selectedDate" class="col-md-2 col-form-label">Select Date</label>
-                    <div class="col-12 col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text" for="selectedDate">Select Date</span>
                         <input id="selectedDate" type="date" placeholder="Select Date" class="form-control"></input>
                     </div>
                 </div>
                 <div class="row mb-3 row-cols-sm-3 align-items-center">
                     <div class="col-sm-12 col-md-6 mb-2">
-                        <input id="newTask" type="text" placeholder="Enter task" class="form-control"></input>
+                        <input id="newTask" type="text" placeholder="Enter task" class="form-control" type="button"></input>
                     </div>
                     <div class="col-4 col-md-2 mb-2">
-                        <button id="addBtn" class="btn btn-sm btn-primary form-control">Add</button>
+                        <button id="addBtn" class="btn btn-sm btn-primary form-control" type="button">Add</button>
                     </div>
                     <div class="col-4 col-md-2 mb-2">
-                        <button id="selectBtn" class="btn btn-sm btn-primary form-control">Select All</button>
+                        <button id="selectBtn" class="btn btn-sm btn-primary form-control" type="button">Select All</button>
                     </div>
                     <div class="col-4 col-md-2 mb-2">
-                        <button id="deleteBtn" disabled class="btn btn-sm btn-primary form-control">Delete</button>
+                        <button id="deleteBtn" disabled class="btn btn-sm btn-primary form-control" type="button">Delete</button>
                     </div>
                 </div>
-                <div class="row mb-3">
+                <div class="row mb-3" id="errorSection">
                     <span class="col text-danger" id="errorSpan"></span>
                 </div>
                 <div class="row mb-3 justify-content-md-start justify-content-center" id="frequentHeader">
                 </div>
-                <div class="row">
+                <div class="row mb-3">
                     <div class="col-12">
                         <ul id="taskList" class="col list-group">
                         </ul>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 input-group">
+                        <span class="input-group-text">Day's Note</span>
+                        <textarea id="dailyNote" type="textarea" class="form-control"></textarea>
+                        <button class="btn btn-sm btn-primary" type="button" id="addNoteBtn">Save</button>
                     </div>
                 </div>
                     

@@ -11,7 +11,7 @@ interface taskCategoryType {
 }
 
 interface taskType {
-    subject?: string,
+    subject: string,
     score?: number,
     date?: Date,
     creation_date?: string,
@@ -27,6 +27,15 @@ interface noteType {
     date: Date,
     note: string
     creation_date?: Date,
+}
+
+interface majorTaskType {
+    subject: string,
+    score?: number,
+    completion_date?: Date,
+    creation_date?: string,
+    category?: string,
+    status?: string
 }
 
 
@@ -59,6 +68,15 @@ const noteSchema = new mongoose.Schema<noteType>({
     creation_date: Date
 })
 
+const majorTaskSchema = new mongoose.Schema<majorTaskType>({
+    subject: String,
+    score: Number,
+    completion_date: Date,
+    creation_date: Date,
+    category: String,
+    status: String
+})
+
 export function TaskCategoriesModel (mongooose: mongoose.Mongoose) {
     return mongoose.model<taskCategoryType>('task_categories', taskCategorySchema)
 }
@@ -77,4 +95,8 @@ export function CategoryScoreModel (mongoose: mongoose.Mongoose) {
 
 export function NoteModel (mongoose: mongoose.Mongoose) {
     return mongoose.model<noteType>('notes', noteSchema)
+}
+
+export function MajorTaskModel (mongoose: mongoose.Mongoose) {
+    return mongoose.model<majorTaskType>('major_tasks', majorTaskSchema)
 }

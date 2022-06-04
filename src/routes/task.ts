@@ -3,14 +3,21 @@ import moment from 'moment'
 import mongoose from 'mongoose'
 import path from 'path'
 import passport from 'passport'
-import { TaskCategoriesModel, TaskModel, CategoryScoreModel, NoteModel} from '../models/models'
+import { TaskCategoriesModel, 
+    TaskModel, 
+    CategoryScoreModel, 
+    NoteModel, 
+    MajorTaskModel
+} from '../models/models'
 
 let db: mongoose.Mongoose
-let Task: any
+let Task:any
+let MajorTask: any
 
 export default function (mongooose: mongoose.Mongoose, passport: passport.PassportStatic) {
     db = mongoose
     Task = TaskModel(db)
+    MajorTask = MajorTaskModel(db)
     const router = express.Router()
 
     router.get('/tasks', async (req, res) => {
@@ -25,6 +32,30 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
         }
         try {
             const result = await getTasks(filter)
+            res.send(result)
+        }
+        catch (e) {
+            console.log(e)
+        }
+    })
+    router.get('/majorTasks', async (req, res) => {
+        const filter = req.query
+        try {
+            const result = await MajorTask.find(filter)
+            res.send(result)
+        }
+        catch (e) {
+            console.log(e)
+        }
+    })
+    router.post('/majorTask', async (req, res) => {
+        const task = req.body
+        task.status = 'pending'
+        task.creation_date = new Date()
+        task.score = 30
+        try {
+            const newTask = new MajorTask(task)
+            const result = await newTask.save()
             res.send(result)
         }
         catch (e) {
@@ -107,6 +138,61 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
                     $in: taskIds
                 }
             })
+            if (result) {
+                res.send(result)
+            }
+        } 
+        catch(e) {
+            console.log(e)
+            res.status(500).send({ error: e })
+        }
+    })
+    router.delete('/majorTasks', async (req, res) => {
+        const taskIds = req.body
+        try {
+            const result = await MajorTask.deleteMany({
+                _id: {
+                    $in: taskIds
+                }
+            })
+            if (result) {
+                res.send(result)
+            }
+        } 
+        catch(e) {
+            console.log(e)
+            res.status(500).send({ error: e })
+        }
+    })
+    router.put('/majorTasks', async (req, res) => {
+        const {idsToDelete, status} = req.body
+        try {
+            const result = await MajorTask.updateMany({
+                _id: {
+                    $in: idsToDelete
+                }
+            }, {
+                $set: {
+                    status,
+                    completion_date: new Date()
+                }
+            })
+
+            const updatedRecs = await MajorTask.find({
+                _id: {
+                    $in: idsToDelete
+                }
+            })
+            const temp = updatedRecs.map((x: any) => {
+                return {
+                    subject: x.subject,
+                    score: x.score,
+                    creation_date: new Date(),
+                    date: new Date(),
+                    category: 'misc'
+                }
+            })
+            await Task.insertMany(temp)
             if (result) {
                 res.send(result)
             }

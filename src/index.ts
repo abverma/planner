@@ -38,7 +38,9 @@ app.use(passport.authenticate('session'))
 app.use(flash())
 app.use((req, res, next) => {
     log('user logged in: %s', req.isAuthenticated())
-    if (!req.isAuthenticated() && req.path !== '/login') {
+    if (process.env.NODE_ENV === 'development') {
+        next()
+    } else if (!req.isAuthenticated() && req.path !== '/login') {
         res.redirect('/login')
     } else {
         log('skipping login')

@@ -1,21 +1,38 @@
+const selectedDate = document.getElementById('selectedDate')
+
+const newTask = document.getElementById('newTask')
+const newMjTask = document.getElementById('newMjTask')
+
 const addBtn = document.getElementById('addBtn')
 const selectBtn = document.getElementById('selectBtn')
 const deleteBtn = document.getElementById('deleteBtn')
+
 const taskList = document.getElementById('taskList')
-const newTask = document.getElementById('newTask')
+const majorTasksList = document.getElementById('majorTasksList')
+
+const addMjTaskBtn = document.getElementById('addMjTaskBtn')
+const selectMjTaskBtn = document.getElementById('selectMjTaskBtn')
+const deleteMjTaskBtn = document.getElementById('deleteMjTaskBtn')
+const markMjTaskBtn = document.getElementById('markMjTaskBtn')
+
+const addNoteBtn = document.getElementById('addNoteBtn')
 const dailyNote = document.getElementById('dailyNote')
-const selectedDate = document.getElementById('selectedDate')
+
 const errorSpan = document.getElementById('errorSpan')
 const errorSection = document.getElementById('errorSection')
 const totalSpan = document.getElementById('total')
 const frequentHeader = document.getElementById('frequentHeader')
+
 const lastTask = document.getElementById('lastTask')
 const weeklyAvg = document.getElementById('weeklyAvg')
 const monthlyAvg = document.getElementById('monthlyAvg')
+
 const currentTasks = []
 let totalDailyScore = 0
 let selectedDateValue = formatDate(new Date().toISOString())
-let checkedCount = 0
+let taskCheckedCount = 0
+let mjTaskCheckedCount = 0
+
 
 selectedDate.value = selectedDateValue
 
@@ -23,6 +40,13 @@ addBtn.addEventListener('click', (e) => {
 	e.preventDefault()
 	if (newTask.value) {
 		addNewTask(newTask.value)
+	}
+})
+
+addMjTaskBtn.addEventListener('click', (e) => {
+	e.preventDefault()
+	if (newMjTask.value) {
+		addNewMjTask(newMjTask.value)
 	}
 })
 
@@ -51,17 +75,87 @@ deleteBtn.addEventListener('click', (e) => {
 	}
 })
 
+deleteMjTaskBtn.addEventListener('click', (e) => {
+	e.preventDefault()
+	idsToDelete = []
+	if (majorTasksList.hasChildNodes()) {
+		majorTasksList.childNodes.forEach((li) => {
+			if (li.hasChildNodes()) {
+                const div = li.childNodes[0]
+				const checkboxKey = Object.keys(div.childNodes).find((key) => {
+					const child = div.childNodes[key]
+					return child.tagName === 'INPUT' && child.type === 'checkbox'
+				})
+				if (div.childNodes[checkboxKey].checked) {
+					idsToDelete.push(li.getAttribute('mongo_id'))
+				}
+			}
+		})
+	}
+	const confirmDelete = confirm('Are you sure that you want to delete selected tasks?')
+	console.log(confirmDelete)
+	if (confirmDelete) {
+		deleteMajorTasks(idsToDelete)
+		getPendingMajorTasks()
+	}
+})
+
+markMjTaskBtn.addEventListener('click', async (e) => {
+	e.preventDefault()
+	idsToDelete = []
+	if (majorTasksList.hasChildNodes()) {
+		majorTasksList.childNodes.forEach((li) => {
+			if (li.hasChildNodes()) {
+                const div = li.childNodes[0]
+				const checkboxKey = Object.keys(div.childNodes).find((key) => {
+					const child = div.childNodes[key]
+					return child.tagName === 'INPUT' && child.type === 'checkbox'
+				})
+				if (div.childNodes[checkboxKey].checked) {
+					idsToDelete.push(li.getAttribute('mongo_id'))
+				}
+			}
+		})
+	}
+	const confirmDelete = confirm('Are you sure that you want to complete selected tasks?')
+	console.log(confirmDelete)
+	if (confirmDelete) {
+		await updateMajorTasks(idsToDelete)
+		getPendingMajorTasks()
+		getTasksForSelectedDate()
+	}
+})
+
 selectBtn.addEventListener('click', (e) => {
 	e.preventDefault()
 	if (taskList.hasChildNodes()) {
 		taskList.childNodes.forEach((li) => {
 			if (li.hasChildNodes()) {
-				const checkboxKey = Object.keys(li.childNodes).find((key) => {
-					const child = li.childNodes[key]
+				const div = li.childNodes[0]
+				const checkboxKey = Object.keys(div.childNodes).find((key) => {
+					const child = div.childNodes[key]
 					return child.tagName === 'INPUT'
 				})
-				li.childNodes[checkboxKey].checked = true
+				div.childNodes[checkboxKey].checked = true
 				deleteBtn.disabled = false
+			}
+		})
+	}
+})
+
+selectMjTaskBtn.addEventListener('click', (e) => {
+	e.preventDefault()
+	if (majorTasksList.hasChildNodes()) {
+		majorTasksList.childNodes.forEach((li) => {
+			if (li.hasChildNodes()) {
+				const div = li.childNodes[0]
+				const checkboxKey = Object.keys(div.childNodes).find((key) => {
+					const child = div.childNodes[key]
+					return child.tagName === 'INPUT'
+				})
+				div.childNodes[checkboxKey].checked = true
+				deleteMjTaskBtn.disabled = false
+				markMjTaskBtn.disabled = false
 			}
 		})
 	}
@@ -76,11 +170,36 @@ newTask.addEventListener('keydown', (e) => {
 	}
 })
 
+newMjTask.addEventListener('keydown', (e) => {
+	if (newMjTask.value && e.code == 'Enter' && e.key == 'Enter') {
+		e.preventDefault()
+		console.log(e.target.value)
+		addNewMjTask(e.target.value)
+		return false
+	}
+})
+
 dailyNote.addEventListener('keydown', (e) => {
 	if (dailyNote.value && e.code == 'Enter' && e.key == 'Enter') {
 		e.preventDefault()
-		console.log(e.target.value)
 		upsertNote(e.target.value)
+		return false
+	}
+})
+
+dailyNote.addEventListener('keyup', (e) => {
+	if (e.target.value !== dailyNote.originalValue) {
+		addNoteBtn.disabled = false
+	} else {
+		addNoteBtn.disabled = true
+	}
+})
+
+addNoteBtn.addEventListener('click', (e) => {
+	e.preventDefault()
+	if (dailyNote.value) {
+		upsertNote(dailyNote.value)
+		addNoteBtn.disabled = true
 		return false
 	}
 })
@@ -103,11 +222,20 @@ const addNewTask = async (task) => {
 	newTask.value = ''
 }
 
+const addNewMjTask = async (task) => {
+	try {
+		await createMjTask(task)
+	} catch (e) {
+		console.log(e)
+	}
+	newMjTask.value = ''
+}
+
 const populateList = (tasks) => {
 	getStats()
 	taskList.innerHTML = ''
 	totalDailyScore = 0
-	checkedCount = 0
+	taskCheckedCount = 0
 	selectBtn.disabled = true
 	deleteBtn.disabled = true
 	tasks.forEach((element) => {
@@ -125,11 +253,11 @@ const populateList = (tasks) => {
 			checkbox.setAttribute('class', 'form-check-input me-2')
 			checkbox.addEventListener('change', (e) => {
 				if (e.target.checked) {
-					checkedCount++
+					taskCheckedCount++
 				} else {
-					checkedCount--
+					taskCheckedCount--
 				}
-				if (checkedCount) {
+				if (taskCheckedCount) {
 					deleteBtn.disabled = false
 				} else {
 					deleteBtn.disabled = true
@@ -153,6 +281,54 @@ const populateList = (tasks) => {
 	})
 	if (tasks.length) {
 		selectBtn.disabled = false
+	}
+	totalSpan.innerHTML = 'Total: ' + totalDailyScore
+}
+
+const populatePendingList = (tasks) => {
+	majorTasksList.innerHTML = ''
+	mjTaskCheckedCount = 0
+	selectMjTaskBtn.disabled = true
+	deleteMjTaskBtn.disabled = true
+	markMjTaskBtn.disabled = true
+	tasks.forEach((element) => {
+		if (element.name || element.subject) {
+			const name = element.name || element.subject
+			const lI = document.createElement('li')
+            lI.setAttribute('mongo_id', element._id)
+			lI.setAttribute('class', 'list-group-item d-flex justify-content-between')
+
+            const div = document.createElement('div')
+
+			const checkbox = document.createElement('input')
+			checkbox.setAttribute('type', 'checkbox')
+			checkbox.setAttribute('class', 'form-check-input me-2')
+			checkbox.addEventListener('change', (e) => {
+				if (e.target.checked) {
+					mjTaskCheckedCount++
+				} else {
+					mjTaskCheckedCount--
+				}
+				if (mjTaskCheckedCount) {
+					deleteMjTaskBtn.disabled = false
+					markMjTaskBtn.disabled = false
+				} else {
+					deleteMjTaskBtn.disabled = true
+					markMjTaskBtn.disabled = true
+				}
+			})
+			div.appendChild(checkbox)
+
+			const subjectSpan = document.createElement('span')
+			subjectSpan.innerHTML = element.subject
+			div.appendChild(subjectSpan)
+            lI.appendChild(div)
+			
+			majorTasksList.appendChild(lI)
+		}
+	})
+	if (tasks.length) {
+		selectMjTaskBtn.disabled = false
 	}
 	totalSpan.innerHTML = 'Total: ' + totalDailyScore
 }
@@ -191,6 +367,19 @@ const getTasksForSelectedDate = () => {
 		})
 }
 
+const getPendingMajorTasks = () => {
+	fetch('/majorTasks?status=pending')
+		.then((resp) => {
+			return resp.json()
+		})
+		.then((tasks) => {
+			populatePendingList(tasks)
+		})
+		.catch((e) => {
+			console.log(e)
+		})
+}
+
 const getNoteForSelectedDate = () => {
 	dailyNote.value = null
 	fetch('/note?date=' + selectedDateValue)
@@ -198,6 +387,7 @@ const getNoteForSelectedDate = () => {
 			return resp.json()
 		})
 		.then((note) => {
+			dailyNote.originalValue = note.note
 			dailyNote.value = note.note 
 		})
 		.catch((e) => {
@@ -220,6 +410,33 @@ const createTask = async (task) => {
 		if (resp.ok) {
 			console.log('Task added')
 			getTasksForSelectedDate()
+		} else {
+			console.log(resp.body)
+			const result = await resp.json()
+            throw result.error
+		}
+	} catch (e) {
+		console.log(e)
+        if (e.validationError) {
+            throw e.error
+        }
+	}
+}
+
+const createMjTask = async (task) => {
+	try {
+		const resp = await fetch('/majorTask', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json;charset=utf-8',
+			},
+			body: JSON.stringify({
+				subject: task
+			}),
+		})
+		if (resp.ok) {
+			console.log('Major Task added')
+			getPendingMajorTasks()
 		} else {
 			console.log(resp.body)
 			const result = await resp.json()
@@ -316,6 +533,43 @@ const deleteTasks = async (idsToDelete) => {
 	}
 }
 
+const deleteMajorTasks = async (idsToDelete) => {
+	const resp = await fetch('/majorTasks', {
+		method: 'DELETE',
+		headers: {
+			'Content-Type': 'application/json;charset=utf-8',
+		},
+		body: JSON.stringify(idsToDelete),
+	})
+	if (resp.ok) {
+		console.log('Major Task deleted')
+	} else {
+		console.log(resp.body)
+		const result = await resp.json()
+		throw result.error
+	}
+}
+
+const updateMajorTasks = async (idsToDelete) => {
+	const resp = await fetch('/majorTasks', {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json;charset=utf-8',
+		},
+		body: JSON.stringify({
+			idsToDelete,
+			status: 'complete'
+		}),
+	})
+	if (resp.ok) {
+		console.log('Major Tasks updated')
+	} else {
+		console.log(resp.body)
+		const result = await resp.json()
+		throw result.error
+	}
+}
+
 function formatDate(date) {
 	if (typeof date === 'string') {
 		return date.split('T')[0]
@@ -325,5 +579,6 @@ function formatDate(date) {
 }
 
 getTasksForSelectedDate()
+getPendingMajorTasks()
 getNoteForSelectedDate()
 getFrequentTasks()

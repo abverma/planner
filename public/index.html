@@ -18,51 +18,80 @@
     </header>
     <div class="container-fluid mb-md-3">
         <div class="row">
-            <form class="col-md-8">
-                <div class="row align-items-center justify-content-md-start justify-content-between bg-light pt-2 mb-2">
-                    <h4 class="col-2 col-md-2">Tasks</h4>
-                    <h4 class="col-4" id="total"></h4>
-                </div>
-                <div class="row mb-4">
-                    <div class="input-group">
-                        <span class="input-group-text" for="selectedDate">Select Date</span>
-                        <input id="selectedDate" type="date" placeholder="Select Date" class="form-control"></input>
+            <div class="row col-md-8">
+                <div class="col-12">
+                    <div class="row mb-3 pt-2 bg-danger">
+                        <h4 class="col">Major Tasks</h4>
                     </div>
-                </div>
-                <div class="row mb-3 row-cols-sm-3 align-items-center">
-                    <div class="col-sm-12 col-md-6 mb-2">
-                        <input id="newTask" type="text" placeholder="Enter task" class="form-control" type="button"></input>
+                    <div class="row mb-3 row-cols-sm-3 align-items-center">
+                        <div class="col-sm-12 col-md-4 mb-2">
+                            <input id="newMjTask" type="text" placeholder="Enter task" class="form-control" type="button"></input>
+                        </div>
+                        <div class="col-4 col-md-2 mb-2">
+                            <button id="addMjTaskBtn" class="btn btn-sm btn-primary form-control" type="button">Add</button>
+                        </div>
+                        <div class="col-4 col-md-2 mb-2">
+                            <button id="selectMjTaskBtn" class="btn btn-sm btn-primary form-control" type="button">Select All</button>
+                        </div>
+                        <div class="col-4 col-md-2 mb-2">
+                            <button id="deleteMjTaskBtn" disabled class="btn btn-sm btn-primary form-control" type="button">Delete</button>
+                        </div>
+                        <div class="col-4 col-md-2 mb-2">
+                            <button id="markMjTaskBtn" disabled class="btn btn-sm btn-success form-control" type="button">Complete</button>
+                        </div>
                     </div>
-                    <div class="col-4 col-md-2 mb-2">
-                        <button id="addBtn" class="btn btn-sm btn-primary form-control" type="button">Add</button>
-                    </div>
-                    <div class="col-4 col-md-2 mb-2">
-                        <button id="selectBtn" class="btn btn-sm btn-primary form-control" type="button">Select All</button>
-                    </div>
-                    <div class="col-4 col-md-2 mb-2">
-                        <button id="deleteBtn" disabled class="btn btn-sm btn-primary form-control" type="button">Delete</button>
-                    </div>
-                </div>
-                <div class="row mb-3" id="errorSection">
-                    <span class="col text-danger" id="errorSpan"></span>
-                </div>
-                <div class="row mb-3 justify-content-md-start justify-content-center" id="frequentHeader">
-                </div>
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <ul id="taskList" class="col list-group">
+                    <div class="row my-3">
+                        <ul id="majorTasksList" class="col list-group p-2">
                         </ul>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-12 input-group">
-                        <span class="input-group-text">Day's Note</span>
-                        <textarea id="dailyNote" type="textarea" class="form-control"></textarea>
-                        <button class="btn btn-sm btn-primary" type="button" id="addNoteBtn">Save</button>
+                <form class="col-12">
+                    <div class="row align-items-center justify-content-md-start justify-content-between bg-light pt-2 mb-2">
+                        <h4 class="col-2 col-md-2">Today's Tasks</h4>
+                        <h4 class="col-4" id="total"></h4>
                     </div>
-                </div>
-                    
-            </form>
+                    <div class="row mb-4">
+                        <div class="input-group">
+                            <span class="input-group-text" for="selectedDate">Select Date</span>
+                            <input id="selectedDate" type="date" placeholder="Select Date" class="form-control"></input>
+                        </div>
+                    </div>
+                    <div class="row mb-3 row-cols-sm-3 align-items-center">
+                        <div class="col-sm-12 col-md-6 mb-2">
+                            <input id="newTask" type="text" placeholder="Enter task" class="form-control" type="button"></input>
+                        </div>
+                        <div class="col-4 col-md-2 mb-2">
+                            <button id="addBtn" class="btn btn-sm btn-primary form-control" type="button">Add</button>
+                        </div>
+                        <div class="col-4 col-md-2 mb-2">
+                            <button id="selectBtn" class="btn btn-sm btn-primary form-control" type="button">Select All</button>
+                        </div>
+                        <div class="col-4 col-md-2 mb-2">
+                            <button id="deleteBtn" disabled class="btn btn-sm btn-primary form-control" type="button">Delete</button>
+                        </div>
+                    </div>
+                    <div class="row mb-3" id="errorSection">
+                        <span class="col text-danger" id="errorSpan"></span>
+                    </div>
+                    <div class="row mb-3 justify-content-md-start justify-content-center" id="frequentHeader">
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <ul id="taskList" class="col list-group">
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 input-group">
+                            <span class="input-group-text">Day's Note</span>
+                            <textarea id="dailyNote" type="textarea" class="form-control"></textarea>
+                            <button class="btn btn-sm btn-primary" type="button" id="addNoteBtn" disabled>Save</button>
+                        </div>
+                    </div>
+                        
+                </form>
+            </div>
+            
             <div class="stats col-md-4 mt-2 mt-md-0">
                 <div class="row bg-light pt-2">
                     <h4 class="col">Stats</h4>

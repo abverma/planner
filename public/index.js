@@ -117,9 +117,9 @@ markMjTaskBtn.addEventListener('click', async (e) => {
 			}
 		})
 	}
-	const confirmDelete = confirm('Are you sure that you want to complete selected tasks?')
-	console.log(confirmDelete)
-	if (confirmDelete) {
+	const confirmAdd = confirm('Are you sure that you want to complete selected tasks?')
+	console.log(confirmAdd)
+	if (confirmAdd) {
 		await updateMajorTasks(idsToDelete)
 		getPendingMajorTasks()
 		getTasksForSelectedDate()
@@ -222,9 +222,13 @@ const addNewTask = async (task) => {
 	newTask.value = ''
 }
 
-const addNewMjTask = async (task) => {
+const addNewMjTask = async (subject) => {
 	try {
-		await createMjTask(task)
+		const score = prompt('Add a score to this task (default: 30)')
+		await createMjTask({
+			subject,
+			score: score || 30
+		})
 	} catch (e) {
 		console.log(e)
 	}
@@ -386,9 +390,11 @@ const getNoteForSelectedDate = () => {
 		.then((resp) => {
 			return resp.json()
 		})
-		.then((note) => {
-			dailyNote.originalValue = note.note
-			dailyNote.value = note.note 
+		.then((resp) => {
+			if (resp && resp.note) {
+				dailyNote.originalValue = note.note
+				dailyNote.value = note.note 
+			}
 		})
 		.catch((e) => {
 			console.log(e)
@@ -430,9 +436,7 @@ const createMjTask = async (task) => {
 			headers: {
 				'Content-Type': 'application/json;charset=utf-8',
 			},
-			body: JSON.stringify({
-				subject: task
-			}),
+			body: JSON.stringify(task),
 		})
 		if (resp.ok) {
 			console.log('Major Task added')

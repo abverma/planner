@@ -52,7 +52,6 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
         const task = req.body
         task.status = 'pending'
         task.creation_date = new Date()
-        task.score = 30
         try {
             const newTask = new MajorTask(task)
             const result = await newTask.save()
@@ -74,7 +73,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
         }
         try {
             const result = await getNote(filter)
-            res.send(result)
+            res.send(result ? result : {})
         }
         catch (e) {
             console.log(e)

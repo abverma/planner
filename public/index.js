@@ -165,7 +165,10 @@ newTask.addEventListener('keydown', (e) => {
 	if (newTask.value && e.code == 'Enter' && e.key == 'Enter') {
 		e.preventDefault()
 		console.log(e.target.value)
-		addNewTask(e.target.value)
+		addNewTask({
+			subject: e.target.value,
+			date: selectedDateValue
+		})
 		return false
 	}
 })
@@ -327,6 +330,11 @@ const populatePendingList = (tasks) => {
 			subjectSpan.innerHTML = element.subject
 			div.appendChild(subjectSpan)
             lI.appendChild(div)
+
+			const badge = document.createElement('span')
+            badge.innerHTML = element.score
+            badge.setAttribute('class', 'badge bg-primary rounded-pill')
+			lI.appendChild(badge)
 			
 			majorTasksList.appendChild(lI)
 		}
@@ -350,7 +358,10 @@ const populateFrequentTask = (tasks) => {
 		btn.setAttribute('type', 'button')
 		btn.addEventListener('click', (e) => {
             e.preventDefault()
-			addNewTask(e.target.value)
+			addNewTask({
+				subject: e.target.value,
+				date: selectedDateValue
+			})
             return false
 		})
 		div.appendChild(btn)
@@ -408,10 +419,7 @@ const createTask = async (task) => {
 			headers: {
 				'Content-Type': 'application/json;charset=utf-8',
 			},
-			body: JSON.stringify({
-				subject: task,
-				date: selectedDateValue,
-			}),
+			body: JSON.stringify(task),
 		})
 		if (resp.ok) {
 			console.log('Task added')
@@ -424,7 +432,11 @@ const createTask = async (task) => {
 	} catch (e) {
 		console.log(e)
         if (e.validationError) {
-            throw e.error
+            const score = prompt('Score not found for task. Assign score')
+			if (score) {
+				task.score = score
+				createTask(task)
+			}
         }
 	}
 }

@@ -341,13 +341,6 @@ const addTask = async (task: any) => {
         const {subject, multiplier } = sanitizeSubject(task.subject)
         const taskCategoriesModel = TaskCategoriesModel(db)
         const categoryScoreModel = CategoryScoreModel(db)
-        const scores = await categoryScoreModel.find({})
-        if (!scores.length) {
-            return Promise.reject({
-                validationError: true,
-                error: 'Scores not found'
-            })
-        }
         let categoryDoc = await taskCategoriesModel.findOne({
             subject: subject
         })
@@ -356,19 +349,29 @@ const addTask = async (task: any) => {
                 subject: subject.toLowerCase()
             })
         }
-        if (scores.length && categoryDoc) {
-            const categoryScore = scores.find(x => categoryDoc && x.category.toLowerCase() == categoryDoc.get('category').toLowerCase())
-            if (categoryScore) {
-                score = categoryScore.score
+        if (!task.score) {
+            const scores = await categoryScoreModel.find({})
+            if (!scores.length) {
+                return Promise.reject({
+                    validationError: true,
+                    error: 'Scores not found'
+                })
             }
+            if (scores.length && categoryDoc) {
+                const categoryScore = scores.find(x => categoryDoc && x.category.toLowerCase() == categoryDoc.get('category').toLowerCase())
+                if (categoryScore) {
+                    score = categoryScore.score
+                }
+            }
+            if (!score) {
+                return Promise.reject({
+                    validationError: true,
+                    error: 'Score not found for ' + task.subject
+                })
+            }
+            task.score = score * multiplier
         }
-        if (!score) {
-            return Promise.reject({
-                validationError: true,
-                error: 'Score not found for ' + task.subject
-            })
-        }
-        task.score = score * multiplier
+        
         task.creation_date = new Date()
         const newTask = new Task(task)
         return newTask.save()

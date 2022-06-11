@@ -39,7 +39,10 @@ selectedDate.value = selectedDateValue
 addBtn.addEventListener('click', (e) => {
 	e.preventDefault()
 	if (newTask.value) {
-		addNewTask(newTask.value)
+		addNewTask({
+			subject: newTask.value,
+			date: selectedDateValue
+		})
 	}
 })
 

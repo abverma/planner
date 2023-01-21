@@ -14,7 +14,7 @@ import configurePassport from './passport'
 const log = debug('app')
 const app = express()
 const PORT = process.env.PORT || 3000
-const HOST = process.env.HOST || '192.168.1.28:27017'
+const HOST = process.env.HOST || '192.168.1.2:27017'
 const DB = process.env.DB || 'planner'
 const DBLINK: string = `mongodb://${HOST}/${DB}`
 
@@ -47,8 +47,8 @@ app.use((req, res, next) => {
         next()
     }
 })
-app.use(express.static(path.join(__dirname, '../public/style/')))
-app.use(express.static(path.join(__dirname, '../public/')))
+app.use(express.static(path.join(__dirname, '../client/dist/style/')))
+app.use(express.static(path.join(__dirname, '../client/dist/')))
 app.use('/', TaskRouter(mongoose, passport))
 
 app.listen(PORT, async () => {

@@ -164,11 +164,11 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
         }
     })
     router.put('/majorTasks', async (req, res) => {
-        const {idsToDelete, status} = req.body
+        const {ids, status} = req.body
         try {
             const result = await MajorTask.updateMany({
                 _id: {
-                    $in: idsToDelete
+                    $in: ids
                 }
             }, {
                 $set: {
@@ -179,7 +179,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
 
             const updatedRecs = await MajorTask.find({
                 _id: {
-                    $in: idsToDelete
+                    $in: ids
                 }
             })
             const temp = updatedRecs.map((x: any) => {
@@ -268,7 +268,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
         res.render('login')
     })
     router.get('/', (req, res) => {
-        res.sendFile(path.join(__dirname, '../public/index.html'))
+        res.sendFile(path.join(__dirname, '../client/dist/index.html'))
     })
     router.post('/login', passport.authenticate('local', { 
         successRedirect: '/',

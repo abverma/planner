@@ -1,21 +1,21 @@
-<div className="d-flex flex-row min-vh-100 justify-content-center align-items-center">
-    <form action="/login" className="col-11 col-md-4 border rounded p-5" method="post">
-        <div className="text-center">
-            <h3 className="mb-3">Pro-Track</h3>
-            <label className="mb-3 text-md">Enter Details</label>
+<div class="d-flex flex-row min-vh-100 justify-content-center align-items-center">
+    <form action="/login" class="col-11 col-md-4 border rounded p-5" method="post">
+        <div class="text-center">
+            <h3 class="mb-3">Pro-Track</h3>
+            <label class="mb-3 text-md">Enter Details</label>
         </div>
         {{#if messages}}
-        <div className="mb-3 text-danger">
+        <div class="mb-3 text-danger">
             {{#each messages}}
                 <span>{{this}}</span>
             {{/each}}
         </div>
         {{/if}}
         
-        <input type="text" className="form-control mb-3" placeholder="Username" name="username" autofocus required></input>
-        <input type="password" className="form-control mb-3" placeholder="Password" name="password" required></input>
-        <div className="row justify-content-center">
-                <button type="submit" className="col-3 col-md-3 btn btn-primary">Sign in</button>
+        <input type="text" class="form-control mb-3" placeholder="Username" name="username" autofocus required></input>
+        <input type="password" class="form-control mb-3" placeholder="Password" name="password" required></input>
+        <div class="row justify-content-center">
+                <button type="submit" class="col-3 col-md-3 btn btn-primary">Sign in</button>
         </div>
     </form>    
 </div>

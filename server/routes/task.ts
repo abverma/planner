@@ -279,6 +279,16 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
         req.logout()
         res.redirect('/')
     })
+    router.post('/taskCategories', async (req, res) => {
+        try {
+            const result = await addTaskCategories(req.body)
+            res.send(result)
+        }
+        catch (e) {
+            console.log(e)
+            res.status(500).send({ error: e })
+        }
+    })
 
     return router
 }
@@ -457,4 +467,9 @@ const addNote = async (note: any) => {
     }, {
         upsert: true
     })
+}
+
+const addTaskCategories = (taskCategories: any) => {
+    const taskCategoriesModel = TaskCategoriesModel(db)
+    return taskCategoriesModel.insertMany(taskCategories)
 }

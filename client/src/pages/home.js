@@ -1,5 +1,5 @@
 import React from 'react'
-import MajorTaskPanel from './majorTaskPanel'
+import MajorTaskPanel from '../fragments/majorTaskPanel'
 
 export default class HomePage extends React.Component {
 	constructor(props) {
@@ -328,10 +328,10 @@ export default class HomePage extends React.Component {
 							<MajorTaskPanel />
 							<form className='col-12'>
 								<div className='row align-items-center justify-content-md-start justify-content-between bg-light pt-2 mb-2'>
-									<h4 className='col-2 col-md-2'>Today's Tasks</h4>
-									<h4 className='col-4' id='total'>
+									<h5 className='col-2 col-md-2'>Today's Tasks</h5>
+									<h5 className='col-4' id='total'>
 										Total: {this.state.tasks.reduce((p, c) => p + c.score, 0)}
-									</h4>
+									</h5>
 								</div>
 								<div className='row mb-4'>
 									<div className='input-group'>
@@ -429,7 +429,7 @@ export default class HomePage extends React.Component {
 
 					<div className='stats col-12 col-md-4 mt-2 mt-md-0'>
 						<div className='row bg-light pt-2'>
-							<h4 className='col'>Stats</h4>
+							<h5 className='col'>Stats</h5>
 						</div>
 						<ul>
 							<li>

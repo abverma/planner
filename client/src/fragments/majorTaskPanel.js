@@ -211,7 +211,7 @@ export default class MajorTaskPanel extends React.Component {
 		return (
 			<div className='col-12'>
 				<div className='row pt-2 bg-danger'>
-					<h4 className='col'>Major Tasks</h4>
+					<h5 className='col'>Major Tasks</h5>
 				</div>
 				<div className='row my-3 row-cols-sm-3 align-items-center'>
 					<div className='col-sm-12 col-md-4 mb-2'>

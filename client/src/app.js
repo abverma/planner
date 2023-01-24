@@ -19,7 +19,7 @@ export default class App extends React.Component {
 	}
 	async componentDidMount() {
 		const main = ReactDOM.createRoot(document.getElementById('main'))
-		const path = window.location.href.split('/').length > 2 ? window.location.href.split('/')[3] : '#'
+		const path = window.location.href.split('/').length > 2 ? window.location.href.split('/')[3] || '#' : '#'
 		await this.setState((state) => ({
 			root: main
 		}))

@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import HomePage from './pages/home'
 import SetupPage from './pages/setup'
+import AnalyticsPage from './pages/analytics'
 
 export default class App extends React.Component {
 	constructor(props) {
@@ -14,6 +15,9 @@ export default class App extends React.Component {
 			}, {
 				id: 'SetupPage',
 				path: '#setup'
+			}, {
+				id: 'AnalyticsPage',
+				path: '#analytics'
 			}]
 		}
 	}
@@ -34,6 +38,9 @@ export default class App extends React.Component {
 				break
 			case 'SetupPage':
 				main.render(<SetupPage />)
+				break
+			case 'AnalyticsPage':
+				main.render(<AnalyticsPage />)
 				break
 			default:
 				break
@@ -67,6 +74,11 @@ export default class App extends React.Component {
 								<li className='nav-item'>
 									<a id='SetupPage' className='nav-link' href="#setup" onClick={(e) => this.renderPage('#setup')}>
 										Setup
+									</a>
+								</li>
+								<li className='nav-item'>
+									<a id='AnalyticsPage' className='nav-link' href="#analytics" onClick={(e) => this.renderPage('#analytics')}>
+										Analytics
 									</a>
 								</li>
 							</ul>

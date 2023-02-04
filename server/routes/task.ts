@@ -289,6 +289,50 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             res.status(500).send({ error: e })
         }
     })
+    router.get('/analytics', async (req, res) => {
+        try {
+            console.log(moment().subtract(30, 'days').format().split('T')[0])
+            const pipelines = [
+                {
+                    $match: {
+                        date: {
+                            $gte: new Date(moment().subtract(30, 'days').format().split('T')[0])
+                        }, 
+                        $and: [
+                            {
+                                category: {
+                                    $exists: true
+                                }
+                            }
+                        ]
+                    }
+                }, 
+                {
+                    $group: {
+                        _id: '$category',
+                        count: { $sum: 1 }
+                    }
+                }
+            ]
+            const result = await aggregate(pipelines)
+            res.send(result)
+        }
+        catch (e) {
+            console.log(e)
+            res.status(500).send({ error: e })
+        }
+    })
+    router.get('/categories', async (req, res) => {
+        try {
+            const categoryModel = CategoryScoreModel(db)
+            res.send(await categoryModel.find({}).sort({category: 1}))
+        }
+        catch (e) {
+            console.log(e)
+            res.status(500).send({ error: e })
+        }
+
+    })
 
     return router
 }
@@ -383,6 +427,7 @@ const addTask = async (task: any) => {
         }
         
         task.creation_date = new Date()
+        task.category = categoryDoc?.category
         const newTask = new Task(task)
         return newTask.save()
     } 
@@ -408,7 +453,7 @@ const deleteMany = async (query: object) => {
 }
 
 const aggregate = async (pipelines: mongoose.PipelineStage[]) => {
-    return Task.aggregate(pipelines)
+    return Task.aggregate(pipelines).sort({_id: 1})
 }
 
 const refactorData = async () => {

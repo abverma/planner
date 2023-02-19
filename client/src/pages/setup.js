@@ -17,22 +17,22 @@ export default class SetupPage extends React.Component {
 		}
 		this.setState((state) => ({
 			taskRows: state.taskRows.concat(newRow),
-            dirty: false
+			dirty: false,
 		}))
 	}
 
-    handleAlertClose(e) {
-        this.setState((state) => ({
-			saveSuccess: false
+	handleAlertClose(e) {
+		this.setState((state) => ({
+			saveSuccess: false,
 		}))
-    }
+	}
 
 	async handleCategoryOnChange(e, idx) {
 		await this.updateTaskRows(e.target.value, 'category', idx)
 		this.checkIsDirty()
 	}
 
-    async handleSubjectOnChange(e, idx) {
+	async handleSubjectOnChange(e, idx) {
 		await this.updateTaskRows(e.target.value, 'subject', idx)
 		this.checkIsDirty()
 	}
@@ -78,10 +78,19 @@ export default class SetupPage extends React.Component {
 			return (
 				<div className='alert alert-success alert-dismissible' role='alert'>
 					<div>Save successful!</div>
-                    <button type='button' className='btn-close' onClick={(e) => this.handleAlertClose(e)}></button>
+					<button type='button' className='btn-close' onClick={(e) => this.handleAlertClose(e)}></button>
 				</div>
 			)
 		}
+	}
+
+	async deleteRow (idx) {
+		const newRowSet = this.state.taskRows.slice(0)
+		newRowSet.splice(idx, 1)
+		await this.setState((state) => ({
+			taskRows: newRowSet
+		}))
+		this.checkIsDirty()
 	}
 
 	render() {
@@ -90,44 +99,48 @@ export default class SetupPage extends React.Component {
 				<div className='row justify-content-center pt-5'>
 					<div className='col col-md-6 col-12'>
 						<div id='alertPlaceholder'>{this.alert()}</div>
-						<div className='row border-bottom m-2'>
+						<div className='row border-bottom px-2 mb-4'>
 							<h5>Add new tasks</h5>
 						</div>
-						<div className='row justify-content-end m-2'>
-							<div className='col-md-2 col-4'>
+						<div className='row align-items-center justify-content-evenly m-2'>
+							<div className='col-md-6 col-12 mb-2'>
+								<input type='text' className='form-control' placeholder='Search a task'/>
+							</div>
+							<div className='col-md-2 col-4 mb-2'>
 								<button type='button' className='btn btn-sm btn-primary form-control' onClick={(e) => this.addRow(e)}>
 									Add
 								</button>
 							</div>
-							<div className='col-md-2 col-4'>
-								<button type='button' className='btn btn-sm btn-primary form-control' onClick={(e) => this.save(e)} disabled={!this.state.dirty}>
+							<div className='col-md-2 col-4 mb-2'>
+								<button type='button' className='col-md-2 col-4 mb-2 btn btn-sm btn-primary form-control' onClick={(e) => this.save(e)} disabled={!this.state.dirty}>
 									Save
 								</button>
 							</div>
 						</div>
-						<div id='taskRow' className='mt-5'>
 							{this.state.taskRows.map((x, idx) => {
 								return (
-									<div key={idx} className='row justify-content-between mx-2'>
-										<div className='col-12 col-md-6 mb-2'>
+									<div id='taskRow' key={idx} className='row justify-content-between'>
+										<div className='col-12 col-md-5 mb-2'>
 											<input type='text' className='form-control' value={x.subject} placeholder='Enter new task' onChange={(e) => this.handleSubjectOnChange(e, idx)}></input>
 										</div>
-										<div className='col-12 col-md-6 mb-2'>
+										<div className='col-10 col-md-6 mb-2'>
 											<select className='form-select' aria-label='Default select example' value={x.category} onChange={(e) => this.handleCategoryOnChange(e, idx)}>
 												<option defaultValue>Select category</option>
 												<option value='baby-care'>Baby Care</option>
 												<option value='cardio'>Cardio</option>
-												<option value='chore'>Chore</option>
+												<option value='chores'>Chore</option>
 												<option value='cleaning'>Cleaning</option>
 												<option value='health'>Health</option>
 												<option value='productivity'>Productivity</option>
 												<option value='resistance-training'>Resistance Training</option>
 											</select>
 										</div>
+										<div className='col-2 col-md-1 mt-2'>
+											<button type='button' className='btn-close text-center' aria-label='Close' onClick={(e) => this.deleteRow(idx)}></button>
+										</div>
 									</div>
 								)
 							})}
-						</div>
 					</div>
 				</div>
 			</div>

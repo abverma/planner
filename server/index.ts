@@ -14,7 +14,7 @@ import configurePassport from './passport'
 const log = debug('app')
 const app = express()
 const PORT = process.env.PORT || 3000
-const HOST = process.env.HOST || '192.168.1.4:27017'
+const HOST = process.env.HOST || '192.168.1.11:27017'
 const DB = process.env.DB || 'planner'
 const DBLINK: string = `mongodb://${HOST}/${DB}`
 

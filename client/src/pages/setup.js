@@ -7,7 +7,8 @@ export default class SetupPage extends React.Component {
 			taskRows: [],
 			dirty: false,
 			saveSuccess: false,
-			searchResults: [],
+			searchCategories: [],
+			searchTasks: [],
 			query: '',
 		}
 	}
@@ -110,19 +111,23 @@ export default class SetupPage extends React.Component {
 	}
 
 	async search() {
-		fetch('/taskCategories?task=' + this.state.query)
-			.then((resp) => {
-				return resp.json()
-			})
-			.then((resp) => {
-				this.setState((state) => ({
-					searchResults: resp,
-				}))
-				console.log(resp)
-			})
-			.catch((e) => {
-				console.log(e)
-			})
+		try {
+			const categories = fetch('/taskCategories?subject=' + this.state.query)
+			const tasks = fetch('/searchTasks?search=' + this.state.query + '&limit=5')
+
+			const result = await Promise.all([categories, tasks])
+
+			const searchCategories = await result[0].json()
+			const searchTasks = await result[1].json()
+
+			this.setState((state) => ({
+				searchCategories,
+				searchTasks
+			}))
+		}
+		catch (e) {
+			console.log(e)
+		}
 	}
 
 	render() {
@@ -156,19 +161,52 @@ export default class SetupPage extends React.Component {
 								</button>
 							</div>
 						</div>
+
 						{
-							this.state.searchResults.length ? 
-									<div class="table-responsive">
-										<table className="table mb-4">
-											<thead>
+							this.state.searchTasks.length ? 
+									<div className='table-responsive'>
+										<table className='table table-borderless caption-top'>
+											<caption>Recent Tasks</caption>
+											<thead className='table-light'>
 												<tr>
-													<th scope="col" className='text-muted'>Task</th>
-													<th scope="col" className='text-muted'>Category</th>
+													<th scope='col' className='text-muted'>Task</th>
+													<th scope='col' className='text-muted'>Date</th>
+													<th scope='col' className='text-muted'>Category</th>
 												</tr>
 											</thead>
-											<tbody>
+											<tbody className='list'>
 											{
-												this.state.searchResults.map((x, idx) => {
+												this.state.searchTasks.map((x, idx) => {
+													return (
+														<tr key={x._id}>
+															<td>{x.subject}</td>
+															<td>{new Date(x.date).toDateString()}</td>
+															<td>{x.category}</td>
+														</tr>
+													)
+												})
+											}
+											</tbody>
+										</table>
+									</div>
+								: ''
+							
+						}
+
+						{
+							this.state.searchCategories.length ? 
+									<div className='table-responsive'>
+										<table className='table table-borderless caption-top'>
+											<caption>Task Category</caption>
+											<thead className='table-light'>
+												<tr>
+													<th scope='col' className='text-muted'>Task</th>
+													<th scope='col' className='text-muted'>Category</th>
+												</tr>
+											</thead>
+											<tbody className='list'>
+											{
+												this.state.searchCategories.map((x, idx) => {
 													return (
 														<tr key={x._id}>
 															<td>{x.subject}</td>

@@ -22,6 +22,8 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
 
     router.get('/tasks', async (req, res) => {
         const filter: any = req.query
+        const limit = filter.limit
+        delete filter['limit']
         if (filter['date']) {
             const selectedDate = new Date(filter['date'])
     
@@ -31,7 +33,20 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             }
         }
         try {
-            const result = await getTasks(filter)
+            const result = await getTasks(filter, limit)
+            res.send(result)
+        }
+        catch (e) {
+            console.log(e)
+        }
+    })
+    router.get('/searchTasks', async (req, res) => {
+        debugger;
+        const filter: any = req.query
+        const limit = filter.limit
+        delete filter['limit']
+        try {
+            const result = await searchTasks(filter.search, limit)
             res.send(result)
         }
         catch (e) {
@@ -292,7 +307,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
     router.get('/taskCategories', async (req, res) => {
         try {
             const query: any = req.query
-            const result = await getTaskCategories(query.task)
+            const result = await getTaskCategories(query.subject)
             res.send(result)
         }
         catch (e) {
@@ -454,6 +469,18 @@ const getTasks = async (query: object, limit?: number, skip = 0) => {
     return limit ? Task.find(query).sort([['_id', -1]]).skip(skip).limit(limit) : Task.find(query).sort([['_id', -1]]).skip(skip)
 }
 
+const searchTasks = async (search: string, limit?: number, skip = 0) => {
+    const query = {
+        $or: [{
+            subject: { $regex: search, $options: 'i' }
+        }, {
+            category: { $regex: search, $options: 'i' }
+        }]
+    }
+    
+    return limit ? Task.find(query).sort([['_id', -1]]).skip(skip).limit(limit) : Task.find(query).sort([['_id', -1]]).skip(skip)
+}
+
 const getNote = async (query: object, limit?: number, skip = 0) => {
     const Note = NoteModel(db)
     return Note.findOne(query)
@@ -530,9 +557,13 @@ const addTaskCategories = (taskCategories: any) => {
     return taskCategoriesModel.insertMany(taskCategories)
 }
 
-const getTaskCategories = (task: string) => {
+const getTaskCategories = (search: string) => {
     const taskCategoriesModel = TaskCategoriesModel(db)
     return taskCategoriesModel.find({
-        subject: { $regex: task, $options: 'i' }
+        $or: [{
+            subject: { $regex: search, $options: 'i' }
+        }, {
+            category: { $regex: search, $options: 'i' }
+        }]
     })
 }

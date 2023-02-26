@@ -1,23 +1,24 @@
 import express from 'express'
 import { json, urlencoded } from 'body-parser'
 import mongoose from 'mongoose'
-import moment from 'moment'
 import path from 'path'
-import TaskRouter  from './routes/task'
 import debug from 'debug'
 import passport from 'passport'
 import session from 'express-session'
 import flash from 'express-flash'
 import { engine }  from 'express-handlebars'
 import configurePassport from './passport'
+import TaskRouter  from './routes/task'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const log = debug('app')
 const app = express()
-const PORT = process.env.PORT || 3000
-const HOST = process.env.HOST || '192.168.1.11:27017'
-const DB = process.env.DB || 'planner'
-const DBLINK: string = `mongodb://${HOST}/${DB}`
-
+const PORT = process.env.SERVER_PORT
+const DB_HOST = process.env.DB_HOST
+const DB_NAME = process.env.DB_NAME
+const DBLINK = `mongodb://${DB_HOST}/${DB_NAME}`
 
 configurePassport(passport, mongoose)
 app.use(urlencoded({ extended: false }))

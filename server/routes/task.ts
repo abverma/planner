@@ -289,6 +289,17 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             res.status(500).send({ error: e })
         }
     })
+    router.get('/taskCategories', async (req, res) => {
+        try {
+            const query: any = req.query
+            const result = await getTaskCategories(query.task)
+            res.send(result)
+        }
+        catch (e) {
+            console.log(e)
+            res.status(500).send({ error: e })
+        }
+    })
     router.get('/analytics', async (req, res) => {
         try {
             console.log(moment().subtract(30, 'days').format().split('T')[0])
@@ -517,4 +528,11 @@ const addNote = async (note: any) => {
 const addTaskCategories = (taskCategories: any) => {
     const taskCategoriesModel = TaskCategoriesModel(db)
     return taskCategoriesModel.insertMany(taskCategories)
+}
+
+const getTaskCategories = (task: string) => {
+    const taskCategoriesModel = TaskCategoriesModel(db)
+    return taskCategoriesModel.find({
+        subject: { $regex: task, $options: 'i' }
+    })
 }

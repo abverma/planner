@@ -453,7 +453,9 @@ const addTask = async (task: any) => {
         }
         
         task.creation_date = new Date()
-        task.category = categoryDoc?.category
+        if (!task.category) {
+            task.category = categoryDoc?.category
+        }
         const newTask = new Task(task)
         return newTask.save()
     } 

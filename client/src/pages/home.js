@@ -62,6 +62,7 @@ export default class HomePage extends React.Component {
 				const score = prompt('Score not found for task. Assign score.')
 				if (score) {
 					task.score = score
+					task.category = 'misc'
 					await this.createTask(task)
 				}
 			}

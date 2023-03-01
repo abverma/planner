@@ -359,6 +359,18 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
         }
 
     })
+    router.post('/categories', async (req, res) => {
+        try {
+            const newCategories = req.body
+            const categoryModel = CategoryScoreModel(db)
+            const result = await categoryModel.insertMany(newCategories)
+            res.send(result)
+        }
+        catch (e) {
+            console.log(e)
+            res.status(500).send({ error: e })
+        }
+    })
 
     return router
 }

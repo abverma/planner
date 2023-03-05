@@ -26,10 +26,15 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
         delete filter['limit']
         if (filter['date']) {
             const selectedDate = new Date(filter['date'])
+            const startDate = new Date()
+            const endDate = new Date()
+
+            startDate.setDate(selectedDate.getDate() - 1)
+            endDate.setDate(selectedDate.getDate() + 1)
     
             filter['date'] = {
-                $gte: moment(selectedDate).startOf('day').format(),
-                $lt: moment(selectedDate).endOf('day').format()
+                $gt: startDate,
+                $lt: endDate
             }
         }
         try {
@@ -40,6 +45,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             console.log(e)
         }
     })
+
     router.get('/searchTasks', async (req, res) => {
         debugger;
         const filter: any = req.query
@@ -53,6 +59,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             console.log(e)
         }
     })
+
     router.get('/majorTasks', async (req, res) => {
         const filter = req.query
         try {
@@ -63,6 +70,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             console.log(e)
         }
     })
+
     router.post('/majorTask', async (req, res) => {
         const task = req.body
         task.status = 'pending'
@@ -76,6 +84,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             console.log(e)
         }
     })
+
     router.get('/note', async (req, res) => {
         const filter: any = req.query
         if (filter['date']) {
@@ -94,6 +103,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             console.log(e)
         }
     })
+
     router.post('/task', async (req, res) => {
         const task = req.body
         try {
@@ -107,6 +117,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             res.status(500).send({ error: e })
         }
     })
+
     router.put('/note', async (req, res) => {
         const note = req.body
         try {
@@ -120,30 +131,56 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             res.status(500).send({ error: e })
         }
     })
+
     router.get('/frequestTasks', async (req, res) => {
         const filter: any = req.query
-        const maxDate = new Date().getDate()
-        const minDate = maxDate - 7
-        const limit = 10
-    
-        filter['date'] = {
-            $gte:moment().subtract(7, 'days').format(),
-            $lte:  moment().format()
-        }
+        const currentDate = new Date()
+        const startDate = new Date()
+        startDate.setDate(currentDate.getDate() - 7)
+        const pipelines = [
+            {
+                $match: {
+                    date: {
+                        $gte: startDate,
+                        $lte: currentDate
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: '$subject',
+                    count: {
+                        $sum: 1 
+                    }
+                }
+            }, 
+            {
+                $addFields: {
+                    subject: '$_id'
+                }
+            }, 
+            {
+                $unset: '_id'
+            },
+            {
+                $sort: {
+                    count: -1
+                }
+            },
+            {
+                $limit: 10
+            }
+        ]
     
         try {
-            const result = await getTasks(filter, limit)
-            if (result.length) {
-                const frequentTasks = prepareFrequentTaskMap(result)
-                res.send(frequentTasks)
-            } else {
-                res.send({})
-            }
+            const result = await aggregate(pipelines)
+            res.send(result)
         }
         catch (e) {
             console.log(e)
         }
     })
+
     router.delete('/tasks', async (req, res) => {
         const taskIds = req.body
         try {
@@ -161,6 +198,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             res.status(500).send({ error: e })
         }
     })
+
     router.delete('/majorTasks', async (req, res) => {
         const taskIds = req.body
         try {
@@ -178,6 +216,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             res.status(500).send({ error: e })
         }
     })
+
     router.put('/majorTasks', async (req, res) => {
         const {ids, status} = req.body
         try {
@@ -216,25 +255,27 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             res.status(500).send({ error: e })
         }
     })
+
     router.get('/getStats', async (req, res) => {
         try {
             const stat: any = {}
             const doc = await getTasks({}, 1)
             stat.lastTask = doc.length ? doc[0] : {}
     
-            let startDate = moment().startOf('week').format().split('T')[0]
+            let startDate = new Date()
+            startDate.setDate(startDate.getDate() - 7)
             const pipelines = [
                 {
                     $match: {
                         date: {
-                            $gte: new Date(startDate),
+                            $gte: startDate,
                         },
                     },
                 },
                 {
                     $group: {
                         _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
-                        score: {
+                        total: {
                             $sum: '$score',
                         },
                     },
@@ -243,7 +284,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
                     $group: {
                         _id: null,
                         averageScore: {
-                            $avg: '$score',
+                            $avg: '$total',
                         },
                     },
                 },
@@ -251,11 +292,12 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             const weeklyAggr = await aggregate(pipelines)
             stat.weeklyAggr = weeklyAggr
     
-            startDate = moment().startOf('month').format().split('T')[0]
+            startDate.setDate(new Date().getDate() - 31)
+
             pipelines[0] = {
                 '$match': {
                     date: {
-                        $gte: new Date(startDate),
+                        $gte: startDate,
                     }
                 }
             }
@@ -268,6 +310,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             res.status(500).send({ error: e })
         }
     })
+
     router.get('/refactorData', (req, res) => {
         try {
             refactorData()
@@ -279,21 +322,26 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             console.log(e)
         }
     })
+
     router.get('/login', (req, res) => {
         res.render('login')
     })
+
     router.get('/', (req, res) => {
         res.sendFile(path.join(__dirname, '../client/dist/index.html'))
     })
+
     router.post('/login', passport.authenticate('local', { 
         successRedirect: '/',
         failureRedirect: '/login',
         failureFlash: true
     }))
+
     router.get('/logout', (req, res) => {
         req.logout()
         res.redirect('/')
     })
+
     router.post('/taskCategories', async (req, res) => {
         try {
             const result = await addTaskCategories(req.body)
@@ -304,6 +352,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             res.status(500).send({ error: e })
         }
     })
+
     router.get('/taskCategories', async (req, res) => {
         try {
             const query: any = req.query
@@ -315,6 +364,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             res.status(500).send({ error: e })
         }
     })
+
     router.get('/analytics', async (req, res) => {
         try {
             console.log(moment().subtract(30, 'days').format().split('T')[0])
@@ -348,6 +398,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             res.status(500).send({ error: e })
         }
     })
+
     router.get('/categories', async (req, res) => {
         try {
             const categoryModel = CategoryScoreModel(db)
@@ -359,6 +410,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
         }
 
     })
+    
     router.post('/categories', async (req, res) => {
         try {
             const newCategories = req.body
@@ -504,8 +556,8 @@ const deleteMany = async (query: object) => {
     return Task.deleteMany(query)
 }
 
-const aggregate = async (pipelines: mongoose.PipelineStage[]) => {
-    return Task.aggregate(pipelines).sort({_id: 1})
+const aggregate = async (pipelines: object[]) => {
+    return Task.aggregate(pipelines)
 }
 
 const refactorData = async () => {

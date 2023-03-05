@@ -178,7 +178,7 @@ export default class HomePage extends React.Component {
 		}
 	}
 
-	handleAddNoteBtnClick(e) {
+	handleSaveNoteBtnClick(e) {
 		e.preventDefault()
 		this.upsertNote(dailyNote.value)
 		return false
@@ -374,11 +374,11 @@ export default class HomePage extends React.Component {
 									<span className='col text-danger' id='errorSpan'></span>
 								</div>
 								<div className='row mb-3 justify-content-md-start justify-content-center' id='frequentHeader'>
-									{Object.keys(this.state.frequentTasks).map((x) => {
+									{this.state.frequentTasks.map((x, idx) => {
 										return (
-											<div key={x} className='col-auto mb-2'>
-												<button className='btn btn-sm btn-outline-dark form-control' type='button' onClick={(e) => this.handlePillClick(e, x)}>
-													{x}
+											<div key={idx} className='col-auto mb-2'>
+												<button className='btn btn-sm btn-outline-dark form-control' type='button' onClick={(e) => this.handlePillClick(e, x.subject)}>
+													{x.subject}
 												</button>
 											</div>
 										)
@@ -410,7 +410,6 @@ export default class HomePage extends React.Component {
 											className='form-control'
 											value={this.state.dailyNote}
 											onKeyDown={(e) => this.handleNoteKeydown(e)}
-											onKeyUp={(e) => this.handleNoteKeyup(e)}
 											onChange={(e) => this.handleNoteBtnOnChange(e)}
 										></textarea>
 										<button
@@ -418,7 +417,7 @@ export default class HomePage extends React.Component {
 											type='button'
 											id='addNoteBtn'
 											disabled={this.state.dailyNote == this.state.originalDailyNote}
-											onClick={(e) => this.handleAddNoteBtnClick(e)}
+											onClick={(e) => this.handleSaveNoteBtnClick(e)}
 										>
 											Save
 										</button>

@@ -108,13 +108,11 @@ export default class HomePage extends React.Component {
 				return resp.json()
 			})
 			.then((resp) => {
-				if (resp && resp.note) {
-					this.setState((state) => ({
-						dailyNote: resp.note,
-						originalDailyNote: resp.note,
-					}))
-				}
-			})
+				this.setState((state) => ({
+					dailyNote: resp?.note || '',
+					originalDailyNote: resp?.note || '',
+				}))
+		})
 			.catch((e) => {
 				console.log(e)
 			})

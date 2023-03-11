@@ -30,7 +30,9 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
             const endDate = new Date()
 
             startDate.setDate(selectedDate.getDate() - 1)
+            startDate.setHours(24, 0, 0)
             endDate.setDate(selectedDate.getDate() + 1)
+            endDate.setHours(0, 0, 0)
     
             filter['date'] = {
                 $gt: startDate,
@@ -410,7 +412,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
         }
 
     })
-    
+
     router.post('/categories', async (req, res) => {
         try {
             const newCategories = req.body

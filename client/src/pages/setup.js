@@ -9,6 +9,7 @@ export default class SetupPage extends React.Component {
 			saveSuccess: false,
 			searchTaskCategories: [],
 			searchTasks: [],
+			searchNotes: [],
 			categories: [],
 			query: '',
 		}
@@ -128,17 +129,20 @@ export default class SetupPage extends React.Component {
 
 	async search() {
 		try {
-			const categories = fetch('/taskCategories?subject=' + this.state.query)
+			const categories = fetch('/searchTaskCategories?subject=' + this.state.query)
 			const tasks = fetch('/searchTasks?search=' + this.state.query + '&limit=5')
+			const notes = fetch('/searchNotes?search=' + this.state.query + '&limit=5')
 
-			const result = await Promise.all([categories, tasks])
+			const result = await Promise.all([categories, tasks, notes])
 
 			const searchTaskCategories = await result[0].json()
 			const searchTasks = await result[1].json()
+			const searchNotes = await result[2].json()
 
 			this.setState((state) => ({
 				searchTaskCategories,
 				searchTasks,
+				searchNotes,
 			}))
 		} catch (e) {
 			console.log(e)
@@ -164,7 +168,7 @@ export default class SetupPage extends React.Component {
 	}
 
 	async saveCategories(e) {
-		const newCategories = this.state.categories.filter(x => !x._id)
+		const newCategories = this.state.categories.filter((x) => !x._id)
 		const me = this
 		fetch('/categories', {
 			method: 'POST',
@@ -176,7 +180,7 @@ export default class SetupPage extends React.Component {
 			.then((resp) => {
 				me.fetchCategories()
 				this.setState((state) => ({
-					saveSuccess: true
+					saveSuccess: true,
 				}))
 			})
 			.catch((e) => {
@@ -203,6 +207,8 @@ export default class SetupPage extends React.Component {
 								/>
 							</div>
 						</div>
+
+						<div className='row'>{!this.state.searchTasks.length && !this.state.searchTaskCategories.length && !this.state.searchNotes.length ? <span>No results found</span> : ''}</div>
 						
 						<div className='row'>
 							{this.state.searchTasks.length ? (
@@ -272,6 +278,38 @@ export default class SetupPage extends React.Component {
 							)}
 						</div>
 
+						<div className='row'>
+							{this.state.searchNotes.length ? (
+								<div className='table-responsive'>
+									<table className='table table-borderless caption-top'>
+										<caption>Recent Notes</caption>
+										<thead className='table-light'>
+											<tr>
+												<th scope='col' className='text-muted'>
+													Note
+												</th>
+												<th scope='col' className='text-muted'>
+													Date
+												</th>
+											</tr>
+										</thead>
+										<tbody className='list'>
+											{this.state.searchNotes.map((x, idx) => {
+												return (
+													<tr key={x._id}>
+														<td>{x.note}</td>
+														<td>{new Date(x.date).toDateString()}</td>
+													</tr>
+												)
+											})}
+										</tbody>
+									</table>
+								</div>
+							) : (
+								''
+							)}
+						</div>
+
 						<div className='row align-items-center justify-content-between border-bottom px-2 mt-2 mb-4 text-muted'>
 							<p className='col-md-4 col-4 h5'>Category List</p>
 							<div className='col-md-4 col-6 mb-2'>
@@ -279,7 +317,12 @@ export default class SetupPage extends React.Component {
 									<button type='button' className='btn btn-sm btn-primary form-control' onClick={(e) => this.addCategory(e)}>
 										Add
 									</button>
-									<button type='button' className='btn btn-sm btn-primary form-control ms-2' onClick={(e) => this.saveCategories(e)} disabled={this.state.categories.find(x => x._id == undefined) ? false : true}>
+									<button
+										type='button'
+										className='btn btn-sm btn-primary form-control ms-2'
+										onClick={(e) => this.saveCategories(e)}
+										disabled={this.state.categories.find((x) => x._id == undefined) ? false : true}
+									>
 										Save
 									</button>
 								</div>
@@ -290,7 +333,6 @@ export default class SetupPage extends React.Component {
 								<table className='table table-borderless caption-top'>
 									<thead className='table-light'>
 										<tr>
-											
 											<th scope='col' className='text-muted'>
 												Category
 											</th>
@@ -303,8 +345,9 @@ export default class SetupPage extends React.Component {
 										{this.state.categories.map((x, idx) => {
 											return (
 												<tr key={idx}>
-													
-													<td>{x._id ? x.category : <input className='form-control' type='text' placeholder='Enter new category' onChange={(e) => this.onChangeCategory(e, idx, 'category')}></input>}</td>
+													<td>
+														{x._id ? x.category : <input className='form-control' type='text' placeholder='Enter new category' onChange={(e) => this.onChangeCategory(e, idx, 'category')}></input>}
+													</td>
 													<td>{x._id ? x.score : <input className='form-control' type='text' placeholder='Enter score' onChange={(e) => this.onChangeCategory(e, idx, 'score')}></input>}</td>
 												</tr>
 											)
@@ -338,15 +381,18 @@ export default class SetupPage extends React.Component {
 									<div className='col-10 col-md-6 mb-2'>
 										<select className='form-select' aria-label='Default select example' value={x.category} onChange={(e) => this.handleCategoryOnChange(e, idx)}>
 											<option defaultValue>Select category</option>
-											{
-												this.state.categories.map((x, idx) => {
-													const category = x.category
-													const categoryName = category.split('-').map(y => y.substr(0,1).toUpperCase().concat(y.substr(1, y.length))).join(' ')
-													return (
-														<option key={idx} value={category}>{categoryName}</option>
-													)
-												})
-											}
+											{this.state.categories.map((x, idx) => {
+												const category = x.category
+												const categoryName = category
+													.split('-')
+													.map((y) => y.substr(0, 1).toUpperCase().concat(y.substr(1, y.length)))
+													.join(' ')
+												return (
+													<option key={idx} value={category}>
+														{categoryName}
+													</option>
+												)
+											})}
 										</select>
 									</div>
 									<div className='col-2 col-md-1 mt-2'>

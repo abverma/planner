@@ -49,12 +49,32 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
     })
 
     router.get('/searchTasks', async (req, res) => {
-        debugger;
         const filter: any = req.query
         const limit = filter.limit
         delete filter['limit']
         try {
             const result = await searchTasks(filter.search, limit)
+            res.send(result)
+        }
+        catch (e) {
+            console.log(e)
+        }
+    })
+
+    router.get('/searchNotes', async (req, res) => {
+        const filter: any = req.query
+        const limit = filter.limit
+        delete filter['limit']
+        const query = {
+            note: { $regex: filter.search, $options: 'i' }
+        }
+
+        try {
+            
+            const Notes = NoteModel(db)
+
+            const result = await Notes.find(query).sort([['_id', -1]]).limit(limit)
+
             res.send(result)
         }
         catch (e) {
@@ -355,7 +375,7 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
         }
     })
 
-    router.get('/taskCategories', async (req, res) => {
+    router.get('/searchTaskCategories', async (req, res) => {
         try {
             const query: any = req.query
             const result = await getTaskCategories(query.subject)
@@ -446,33 +466,6 @@ const sanitizeSubject = (subject: string): any => {
     }
 }
 
-const prepareFrequentTaskMap = (result: any) => {
-    const taskMap : { [name: string]: number} = {}
-
-    result.forEach((task: any) => {
-        if (taskMap[task.subject]) {
-            taskMap[task.subject]++
-        } else {
-            taskMap[task.subject] = 1
-        }
-    })
-    let highestCount = 1
-    for (const key in taskMap) {
-        if (taskMap[key] > highestCount) {
-            highestCount = taskMap[key]
-        }
-    }
-    const frequestTasks: { [name: string]: number}= {}
-    for (let i = highestCount; i > 0 && Object.keys(frequestTasks).length < 7; i--) {
-        for (const key in taskMap) {
-            if (taskMap[key] === i) {
-                frequestTasks[key] = i
-            }
-        }
-    }
-    console.log(JSON.stringify(frequestTasks))
-    return frequestTasks
-}
 
 const addTask = async (task: any) => {
     try {
@@ -546,7 +539,30 @@ const searchTasks = async (search: string, limit?: number, skip = 0) => {
         }]
     }
     
-    return limit ? Task.find(query).sort([['_id', -1]]).skip(skip).limit(limit) : Task.find(query).sort([['_id', -1]]).skip(skip)
+    if (limit) {
+        return Task.find(
+            { $text: { $search: search } },
+            { score: { $meta: "textScore" } }
+        ).sort({
+            score: { 
+                $meta: "textScore" 
+            },
+            _id: -1
+        })
+        .skip(skip)
+        .limit(limit)
+    } else {
+        return Task.find(
+            { $text: { $search: search } },
+            { score: { $meta: "textScore" } }
+        ).sort({
+            score: { 
+                $meta: "textScore" 
+            },
+            _id: -1
+        })
+        .skip(skip)
+    }
 }
 
 const getNote = async (query: object, limit?: number, skip = 0) => {
@@ -627,11 +643,8 @@ const addTaskCategories = (taskCategories: any) => {
 
 const getTaskCategories = (search: string) => {
     const taskCategoriesModel = TaskCategoriesModel(db)
-    return taskCategoriesModel.find({
-        $or: [{
-            subject: { $regex: search, $options: 'i' }
-        }, {
-            category: { $regex: search, $options: 'i' }
-        }]
-    })
+    return taskCategoriesModel.find(
+        { $text: { $search: `\"${search}\"` } },
+        { score: { $meta: "textScore" } }
+     ).sort( { score: { $meta: "textScore" }, _id: -1 } )
 }

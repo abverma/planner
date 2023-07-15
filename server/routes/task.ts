@@ -26,11 +26,12 @@ export default function (mongooose: mongoose.Mongoose, passport: passport.Passpo
         delete filter['limit']
         if (filter['date']) {
             const selectedDate = new Date(filter['date'])
-            const startDate = new Date()
-            const endDate = new Date()
+            const startDate = new Date(selectedDate)
+            const endDate = new Date(selectedDate)
 
             startDate.setDate(selectedDate.getDate() - 1)
             startDate.setHours(24, 0, 0)
+
             endDate.setDate(selectedDate.getDate() + 1)
             endDate.setHours(0, 0, 0)
     

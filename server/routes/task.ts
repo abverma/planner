@@ -11,7 +11,7 @@ import { TaskCategoriesModel,
 } from '../models/models'
 
 let db: mongoose.Mongoose
-let Task:any
+let Task: any
 let MajorTask: any
 
 export default function (mongooose: mongoose.Mongoose, passport: passport.PassportStatic) {
@@ -481,14 +481,24 @@ const addTask = async (task: any) => {
         const {subject, multiplier } = sanitizeSubject(task.subject)
         const taskCategoriesModel = TaskCategoriesModel(db)
         const categoryScoreModel = CategoryScoreModel(db)
-        let categoryDoc = await taskCategoriesModel.findOne({
-            subject: subject
-        })
-        if (!categoryDoc) {
-            categoryDoc = await taskCategoriesModel.findOne({
-                subject: subject.toLowerCase()
+        let category = "";
+        if (subject.toLowerCase().includes('clean')) {
+            category = 'cleaning'
+        } else {
+            let categoryDoc = await taskCategoriesModel.findOne({
+                subject: { '$regex': subject, $options: 'i' } 
             })
+
+            if (categoryDoc) {
+                category = categoryDoc.get('category')
+            }
         }
+        
+        // if (!categoryDoc) {
+        //     categoryDoc = await taskCategoriesModel.findOne({
+        //         subject: subject.toLowerCase()
+        //     })
+        // }
         if (!task.score) {
             const scores = await categoryScoreModel.find({})
             if (!scores.length) {
@@ -497,8 +507,8 @@ const addTask = async (task: any) => {
                     error: 'Scores not found'
                 })
             }
-            if (scores.length && categoryDoc) {
-                const categoryScore = scores.find(x => categoryDoc && x.category.toLowerCase() == categoryDoc.get('category').toLowerCase())
+            if (scores.length && category) {
+                const categoryScore = scores.find(x => x.category.toLowerCase() == category.toLowerCase())
                 if (categoryScore) {
                     score = categoryScore.score
                 }
@@ -514,7 +524,7 @@ const addTask = async (task: any) => {
         
         task.creation_date = new Date()
         if (!task.category) {
-            task.category = categoryDoc?.category
+            task.category = category
         }
         const newTask = new Task(task)
         return newTask.save()

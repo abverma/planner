@@ -279,7 +279,7 @@ export default class HomePage extends React.Component {
 
 	handleTaskChange(e) {
 		this.setState({
-			task: e.target.value,
+			task: e.target.value.toLowerCase(),
 		})
 	}
 
